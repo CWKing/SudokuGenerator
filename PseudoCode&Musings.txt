@@ -1,0 +1,3 @@
+Possible ways to handle the Forcing States of Potential, subfamily lock problem (ie, the FSoP case in which a subfamily of 1<K<9 cells all contain the exact same K potentials):
+Since family is an abstraction of column, row, and block, we will likely proceed using some sort of template function to accept custom iterators over these things.
+Need to consider what can be done to expedite this process since tackling it via a brute-force-esque method will be computationally time consuming
