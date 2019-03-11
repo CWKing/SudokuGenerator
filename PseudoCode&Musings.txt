@@ -47,12 +47,16 @@ Procedure for generating sudoku puzzle; follow going down unless specified to ju
 	a) If it has only one potential left, put it in the queue awaiting to be assigned a number.
 
 (UPDATE FAMILY POTENTIALS BLOCK CONTINUE) Find the next cell in the initiate's block family.
-	a) If there are no other cells in the initiate's block family to be updated, proceed to (GRID CHECK)
+	a) If there are no other cells in the initiate's block family to be updated, proceed to (GRID CHECK START)
 	b) Update the potentials of this cell to exclude the number assigned to the initiate; check if the cell has only one potential left.
 		i) If it has only one potential left, put it in the queue awaiting to be assigned a number; return to (UPDATE FAMILY POTENTIALS BLOCK CONTINUE).
 		ii) If not, return to (UPDATE FAMILY POTENTIALS BLOCK CONTINUE)
 
-(GRID CHECK)
+(GRID CHECK START) Set generating to false. Find the first cell in the grid.
+	a) If it contains a number, continue to the next cell.
+	b) If it does not contain a number, set generating to false, pass the cell to FSoP check
+	
+(GRID CHECK CONTINUE)
 
 *(CHOOSE RANDOM CELL)* This will be done by having a container of all the cells which have not yet been assigned a number, and choosing one of them.
 

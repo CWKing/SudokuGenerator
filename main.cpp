@@ -1,3 +1,4 @@
+#define DEBUG
 #include "grid.h"
 #include <iostream>
 
