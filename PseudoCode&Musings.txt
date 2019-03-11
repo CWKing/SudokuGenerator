@@ -1,3 +1,59 @@
 Possible ways to handle the Forcing States of Potential, subfamily lock problem (ie, the FSoP case in which a subfamily of 1<K<9 cells all contain the exact same K potentials):
 Since family is an abstraction of column, row, and block, we will likely proceed using some sort of template function to accept custom iterators over these things.
 Need to consider what can be done to expedite this process since tackling it via a brute-force-esque method will be computationally time consuming
+
+As in each cell we have an array (vector? I imagine each is a static array) of bools (shorts? I hope they're bools; less memory!) we can compare the potential array in each cell; if the cell we have has a "sum" of n potentials (if each potential which is possible in the array is occupied by a one with the index being the actual number minus one), then we need n-1  addition cells in the same family to match those potentials. We can iterate with two loops, the exterior to iterate over which cell we start with to compare potentials, and the interior the remaining cells in the family which have yet to be a starting cell; ie for (size_t i = 0; i < 9; ++i) for (size_t j = i; j < 9; ++j) {...}
+
+
+
+
+Procedure for generating sudoku puzzle; follow going down unless specified to jump-
+
+(ARE WE STILL GENERATING?) Check to be sure we are still generating a sudoku puzzle; if not, break because we are done.
+
+(CHECK THE QUEUE) Check the queue of cells that are waiting to be assigned a number.
+	a) If it is empty, continue to the next step.
+	b) If it is not empty, take the cell from the front of the queue.
+		i) If this cell already has a number in it, pop it from the queue, discard it, and return to step (ARE WE STILL GENERATING)- it shouldn't be there so this shouldn't happen (keyword: /shouldn't/).
+		ii) If this cell doesn't already have a number in it, pop it from the queue. This cell will be called the "initiate". Jump to step (ASSIGN NUMBER INITIATE).
+
+(CHOOSE RANDOM CELL) Choose a random cell. This cell will be called the "initiate".
+		
+(ASSIGN NUMBER INITIATE) Check the potentials of the initiate.
+	a) If it has only one potential, assign that number to the initiate.
+	b) If it has more than one potential, choose a random number from its potentials to assign to it.
+
+(UPDATE INITIATE POTENTIALS AND GATHER INFORMATION) Update the potentials of the initiate to have no remaining potentials, and identify it's row, column, and block families.
+
+(UPDATE FAMILY POTENTIALS ROW START) Find the first cell in the initiate's row family and update its potentials to exclude the number assigned to the initiate; check if the cell has only one potential left.
+	a) If it has only one potential left, put it in the queue awaiting to be assigned a number.
+
+(UPDATE FAMILY POTENTIALS ROW CONTINUE) Find the next cell in the initiate's row family.
+	a) If there are no other cells in the initiate's row family to be updated, proceed to (UPDATE FAMILY POTENTIALS COLUMN START)
+	b) Update the potentials of this cell to exclude the number assigned to the initiate; check if the cell has only one potential left.
+		i) If it has only one potential left, put it in the queue awaiting to be assigned a number; return to (UPDATE FAMILY POTENTIALS ROW CONTINUE).
+		ii) If not, return to (UPDATE FAMILY POTENTIALS ROW CONTINUE)
+
+(UPDATE FAMILY POTENTIALS COLUMN START) Find the first cell in the initiate's column family and update its potentials to exclude the number assigned to the initiate; check if the cell has only one potential left.
+	a) If it has only one potential left, put it in the queue awaiting to be assigned a number.
+
+(UPDATE FAMILY POTENTIALS COLUMN CONTINUE) Find the next cell in the initiate's column family.
+	a) If there are no other cells in the initiate's column family to be updated, proceed to (UPDATE FAMILY POTENTIALS BLOCK START)
+	b) Update the potentials of this cell to exclude the number assigned to the initiate; check if the cell has only one potential left.
+		i) If it has only one potential left, put it in the queue awaiting to be assigned a number; return to (UPDATE FAMILY POTENTIALS COLUMN CONTINUE).
+		ii) If not, return to (UPDATE FAMILY POTENTIALS COLUMN CONTINUE)
+
+(UPDATE FAMILY POTENTIALS BLOCK START) Find the first cell in the initiate's block family and update its potentials to exclude the number assigned to the initiate; check if the cell has only one potential left.
+	a) If it has only one potential left, put it in the queue awaiting to be assigned a number.
+
+(UPDATE FAMILY POTENTIALS BLOCK CONTINUE) Find the next cell in the initiate's block family.
+	a) If there are no other cells in the initiate's block family to be updated, proceed to (GRID CHECK)
+	b) Update the potentials of this cell to exclude the number assigned to the initiate; check if the cell has only one potential left.
+		i) If it has only one potential left, put it in the queue awaiting to be assigned a number; return to (UPDATE FAMILY POTENTIALS BLOCK CONTINUE).
+		ii) If not, return to (UPDATE FAMILY POTENTIALS BLOCK CONTINUE)
+
+(GRID CHECK)
+
+*(CHOOSE RANDOM CELL)* This will be done by having a container of all the cells which have not yet been assigned a number, and choosing one of them.
+
+*(ASSIGN NUMBER INITIATE) b* This will be done by taking a container representing in some manner the potential numbers that can be put in that cell, and choosing one of them. Most likely we will either use an array of bools, and have the index of that array be one less than the number, and the bool value determining if that number can be put in that cell. Alternatively, we can have a container of the values themselves, and remove those values as we go. This will likely be more computationally intensive but memory "efficient" as after a number as been assigned to a cell, this container can be emptied of any remaining values.

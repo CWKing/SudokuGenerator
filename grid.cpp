@@ -13,6 +13,7 @@ short unitStepFunction(short number, short switchpoint) {
 ///Need to use initializer list to initialize the constant pointer to a constant cell vector access
 grid::grid() : access(&GRID) {
 	GRID.reserve(81); //Need to preemptively reserve space BUT not initialize the cells to prevent both const problems and vector memory relocation
+	poteCells.reserve(81);
 	initializeGrid();
 };
 ///End grid class constructor
@@ -67,12 +68,14 @@ void grid::checkPotentialsSoleNum(cell &C) {
 	if (truthCount == 1) {
 		C.setNumber(tempIndex + 1);
 		C.setNecessityTrue();
+		grid::changePotentials(C);
 	};
 };
 ///End private member function grid class checkPotentials
 
 ///Definition private member function grid class initializeGrid
 ///Initializes the grid; called by the default constructor
+///Does this by initializing all cells in the grid with the proper fields
 void grid::initializeGrid() {
 	short blockNum, blockSubIndex, blockIt = 0;
 	for (short ROW = 0; ROW < 9; ++ROW)
