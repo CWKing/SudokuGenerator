@@ -1,8 +1,9 @@
 Definitions:
-	Cell- A data structure which houses several important pieces of information: a NUMBER, a COLUMN INDEX, a ROW INDEX, a BLOCK INDEX, an ARRAY OF POTENTIAL NUMBERS, and a BOOL OF NECESSITY
-	Grid- A container which houses 81 Cells, arranged in nine rows and nine columns
-	Forcing states- States of the Grid which force a change in one or more cells; these will be described in more detail later as they are important and annoying
-	Family- An abstraction of a set of cells (all the cells in a column, row, or block) which influence the potentials in all other cells in the same family
+	Cell- A data structure which houses several important pieces of information: a NUMBER, a COLUMN INDEX, a ROW INDEX, a BLOCK INDEX, an ARRAY OF POTENTIAL NUMBERS, and a BOOL OF NECESSITY.
+	Grid- A container which houses 81 Cells, arranged in nine rows and nine columns.
+	Forcing states- States of the Grid which force a change in one or more cells; these will be described in more detail later as they are important and annoying.
+	Family- An abstraction of a set of cells (all the cells in a column, row, or block) which influence the potentials in all other cells in the same family.
+	Subfamily- A collection of cells from the same family which, when taken together, cause the exclusion of their potentials from other cells in the same family. Identifying subfamilies is an important aspect of tackling FSoP, which has been incredibly hard thus far.
 
 Forcing states, a more in depth analysis:
 	Forcing states, or more specifically the identification of, are going to be the major driving force behind generating consistent, solvable sudoku puzzles.
@@ -26,10 +27,11 @@ Forcing states, a more in depth analysis:
 	
 Different FSoP and an attempt to explain them:
 	Family exclusion- A cell loses a potential because another cell in that family takes a number; potential lost is that number.
-	Symmetric lock- A cell loses one or more potentials because N cells, excluding it, in its family each contain the exact same N potentials; potentials lost are those N potentials.
-	Asymmetric lock- A cell loses one or more potentials because N cells, excluding it, in its family
+	Subfamily lock- A cell loses one or more potentials because N cells, excluding it, in its family form a subfamily. The potentials lost are the accumulative potentials of these N cells.
+
+Identifying Subfamily locks:
 	
-Subfamily definition will need to be redefined to accommodate new observations (subfamilies can be formed without all members having exactly the same number of potentials)
+	
 Since a completed sudoku puzzle contains exactly one number from 1 to 9 eactly once in each row and column, is it the case that a completed sudoku puzzle forms a "jumbled" operation table of an order 9 group? All order nine groups are isomorphic to either integers mod 9 or integers mod 3 cross integers mod 3, both of which are abelian, so maybe it's not too difficult to find out. If so, maybe use this concept to generate sudoku puzzles by re-jumbling the rows and columns, then putting the product of the rows and columns in the associated spots?
 
 A complete sudoku from previous attempt; was successful for this particular seed (0)
@@ -71,7 +73,7 @@ g |[6][8][3][1][5][2][4][9][7]|
 h |[8][2][6][4][7][1][3][5][9]|
 i |[4][5][9][8][3][6][7][2][1]|
 
-not abelian; needs to be abelian! Bad labeling? Not defining of a group operation?
+not abelian; needs to be abelian! Bad labeling? Not defining of a group operation? Try again!
 
     -  -  -  -  -  -  -  -  -
 - |[7][3][1][5][2][9][6][8][4]|
@@ -84,6 +86,254 @@ not abelian; needs to be abelian! Bad labeling? Not defining of a group operatio
 - |[6][8][3][1][5][2][4][9][7]|
 - |[9][4][2][3][6][7][5][1][8]|
 
+start with Z/9Z operation table; 9=0
+    9  1  2  3  4  5  6  7  8
+9 |[9][1][2][3][4][5][6][7][8]|
+1 |[1][2][3][4][5][6][7][8][9]|
+2 |[2][3][4][5][6][7][8][9][1]|
+3 |[3][4][5][6][7][8][9][1][2]|
+4 |[4][5][6][7][8][9][1][2][3]|
+5 |[5][6][7][8][9][1][2][3][4]|
+6 |[6][7][8][9][1][2][3][4][5]|
+7 |[7][8][9][1][2][3][4][5][6]|
+8 |[8][9][1][2][3][4][5][6][7]|
 
+jumble rows so that blocks have no repetition...
+    9  1  2  3  4  5  6  7  8
+9 |[9][1][2][3][4][5][6][7][8]|
+3 |[3][4][5][6][7][8][9][1][2]|
+6 |[6][7][8][9][1][2][3][4][5]|
+1 |[1][2][3][4][5][6][7][8][9]|
+4 |[4][5][6][7][8][9][1][2][3]|
+7 |[7][8][9][1][2][3][4][5][6]|
+2 |[2][3][4][5][6][7][8][9][1]|
+5 |[5][6][7][8][9][1][2][3][4]|
+8 |[8][9][1][2][3][4][5][6][7]|
 
+defines a sudoku, but its very predictable; can we make our other sudoku from this by now swapping columns?
+    9  1  2  3  4  5  6  7  8			Maybe don't jumble columns first?
+9 |[9][1][2][3][4][5][6][7][8]|
+3 |[3][4][5][6][7][8][9][1][2]|
+6 |[6][7][8][9][1][2][3][4][5]|
+1 |[1][2][3][4][5][6][7][8][9]|
+4 |[4][5][6][7][8][9][1][2][3]|
+7 |[7][8][9][1][2][3][4][5][6]|
+2 |[2][3][4][5][6][7][8][9][1]|
+5 |[5][6][7][8][9][1][2][3][4]|
+8 |[8][9][1][2][3][4][5][6][7]|
 
+start with Z/9Z operation table; 9=0
+    9  1  2  3  4  5  6  7  8
+9 |[9][1][2][3][4][5][6][7][8]|
+1 |[1][2][3][4][5][6][7][8][9]|
+2 |[2][3][4][5][6][7][8][9][1]|
+3 |[3][4][5][6][7][8][9][1][2]|
+4 |[4][5][6][7][8][9][1][2][3]|
+5 |[5][6][7][8][9][1][2][3][4]|
+6 |[6][7][8][9][1][2][3][4][5]|
+7 |[7][8][9][1][2][3][4][5][6]|
+8 |[8][9][1][2][3][4][5][6][7]|
+
+swap columns 9 and 7...
+    7  1  2  3  4  5  6  9  8
+9 |[7][1][2][3][4][5][6][9][8]|
+1 |[8][2][3][4][5][6][7][1][9]|
+2 |[9][3][4][5][6][7][8][2][1]|
+3 |[1][4][5][6][7][8][9][3][2]|
+4 |[2][5][6][7][8][9][1][4][3]|
+5 |[3][6][7][8][9][1][2][5][4]|
+6 |[4][7][8][9][1][2][3][6][5]|
+7 |[5][8][9][1][2][3][4][7][6]|
+8 |[6][9][1][2][3][4][5][8][7]|
+
+swap columns 1 and 3...
+    7  3  2  1  4  5  6  9  8
+9 |[7][3][2][1][4][5][6][9][8]|
+1 |[8][4][3][2][5][6][7][1][9]|
+2 |[9][5][4][3][6][7][8][2][1]|
+3 |[1][6][5][4][7][8][9][3][2]|
+4 |[2][7][6][5][8][9][1][4][3]|
+5 |[3][8][7][6][9][1][2][5][4]|
+6 |[4][9][8][7][1][2][3][6][5]|
+7 |[5][1][9][8][2][3][4][7][6]|
+8 |[6][2][1][9][3][4][5][8][7]|
+
+swap columns 2 and 1...
+    7  3  1  2  4  5  6  9  8
+9 |[7][3][1][2][4][5][6][9][8]|
+1 |[8][4][2][3][5][6][7][1][9]|
+2 |[9][5][3][4][6][7][8][2][1]|
+3 |[1][6][4][5][7][8][9][3][2]|
+4 |[2][7][5][6][8][9][1][4][3]|
+5 |[3][8][6][7][9][1][2][5][4]|
+6 |[4][9][7][8][1][2][3][6][5]|
+7 |[5][1][8][9][2][3][4][7][6]|
+8 |[6][2][9][1][3][4][5][8][7]|
+
+swap columns 2 and 5...
+    7  3  1  5  4  2  6  9  8
+9 |[7][3][1][5][4][2][6][9][8]|
+1 |[8][4][2][6][5][3][7][1][9]|
+2 |[9][5][3][7][6][4][8][2][1]|
+3 |[1][6][4][8][7][5][9][3][2]|
+4 |[2][7][5][9][8][6][1][4][3]|
+5 |[3][8][6][1][9][7][2][5][4]|
+6 |[4][9][7][2][1][8][3][6][5]|
+7 |[5][1][8][3][2][9][4][7][6]|
+8 |[6][2][9][4][3][1][5][8][7]|
+
+swap columns 4 and 2...
+    7  3  1  5  2  4  6  9  8
+9 |[7][3][1][5][2][4][6][9][8]|
+1 |[8][4][2][6][3][5][7][1][9]|
+2 |[9][5][3][7][4][6][8][2][1]|
+3 |[1][6][4][8][5][7][9][3][2]|
+4 |[2][7][5][9][6][8][1][4][3]|
+5 |[3][8][6][1][7][9][2][5][4]|
+6 |[4][9][7][2][8][1][3][6][5]|
+7 |[5][1][8][3][9][2][4][7][6]|
+8 |[6][2][9][4][1][3][5][8][7]|
+
+swap columns 4 and 9...
+    7  3  1  5  2  9  6  4  8
+9 |[7][3][1][5][2][9][6][4][8]|
+1 |[8][4][2][6][3][1][7][5][9]|
+2 |[9][5][3][7][4][2][8][6][1]|
+3 |[1][6][4][8][5][3][9][7][2]|
+4 |[2][7][5][9][6][4][1][8][3]|
+5 |[3][8][6][1][7][5][2][9][4]|
+6 |[4][9][7][2][8][6][3][1][5]|
+7 |[5][1][8][3][9][7][4][2][6]|
+8 |[6][2][9][4][1][8][5][3][7]|
+
+swap columns 4 and 8...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+1 |[8][4][2][6][3][1][7][9][5]|
+2 |[9][5][3][7][4][2][8][1][6]|
+3 |[1][6][4][8][5][3][9][2][7]|
+4 |[2][7][5][9][6][4][1][3][8]|
+5 |[3][8][6][1][7][5][2][4][9]|
+6 |[4][9][7][2][8][6][3][5][1]|
+7 |[5][1][8][3][9][7][4][6][2]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+columns are now in the right order; now swap rows...
+swap rows 1 and 6...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+2 |[9][5][3][7][4][2][8][1][6]|
+3 |[1][6][4][8][5][3][9][2][7]|
+4 |[2][7][5][9][6][4][1][3][8]|
+5 |[3][8][6][1][7][5][2][4][9]|
+1 |[8][4][2][6][3][1][7][9][5]|
+7 |[5][1][8][3][9][7][4][6][2]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+swap rows 2 and 1...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+1 |[8][4][2][6][3][1][7][9][5]|
+3 |[1][6][4][8][5][3][9][2][7]|
+4 |[2][7][5][9][6][4][1][3][8]|
+5 |[3][8][6][1][7][5][2][4][9]|
+2 |[9][5][3][7][4][2][8][1][6]|
+7 |[5][1][8][3][9][7][4][6][2]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+swap rows 3 and 5...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+1 |[8][4][2][6][3][1][7][9][5]|
+5 |[3][8][6][1][7][5][2][4][9]|
+4 |[2][7][5][9][6][4][1][3][8]|
+3 |[1][6][4][8][5][3][9][2][7]|
+2 |[9][5][3][7][4][2][8][1][6]|
+7 |[5][1][8][3][9][7][4][6][2]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+swap rows 4 and 7...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+1 |[8][4][2][6][3][1][7][9][5]|
+5 |[3][8][6][1][7][5][2][4][9]|
+7 |[5][1][8][3][9][7][4][6][2]|
+3 |[1][6][4][8][5][3][9][2][7]|
+2 |[9][5][3][7][4][2][8][1][6]|
+4 |[2][7][5][9][6][4][1][3][8]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+swap rows 3 and 4...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+1 |[8][4][2][6][3][1][7][9][5]|
+5 |[3][8][6][1][7][5][2][4][9]|
+7 |[5][1][8][3][9][7][4][6][2]|
+4 |[2][7][5][9][6][4][1][3][8]|
+2 |[9][5][3][7][4][2][8][1][6]|
+3 |[1][6][4][8][5][3][9][2][7]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+swap rows 2 and 3...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+1 |[8][4][2][6][3][1][7][9][5]|
+5 |[3][8][6][1][7][5][2][4][9]|
+7 |[5][1][8][3][9][7][4][6][2]|
+4 |[2][7][5][9][6][4][1][3][8]|
+3 |[1][6][4][8][5][3][9][2][7]|
+2 |[9][5][3][7][4][2][8][1][6]|
+8 |[6][2][9][4][1][8][5][7][3]|
+
+swap rows 2 and 8...
+    7  3  1  5  2  9  6  8  4
+9 |[7][3][1][5][2][9][6][8][4]|
+6 |[4][9][7][2][8][6][3][5][1]|
+1 |[8][4][2][6][3][1][7][9][5]|
+5 |[3][8][6][1][7][5][2][4][9]|
+7 |[5][1][8][3][9][7][4][6][2]|
+4 |[2][7][5][9][6][4][1][3][8]|
+3 |[1][6][4][8][5][3][9][2][7]|
+8 |[6][2][9][4][1][8][5][7][3]|
+2 |[9][5][3][7][4][2][8][1][6]|
+
+Do we have the same completed sudoku?
+After putting back the demarcations...
+    7  3  1   5  2  9   6  8  4
+  +---------+---------+---------+
+9 |[7][3][1]|[5][2][9]|[6][8][4]|
+6 |[4][9][7]|[2][8][6]|[3][5][1]|
+1 |[8][4][2]|[6][3][1]|[7][9][5]|
+  +---------+---------+---------+
+5 |[3][8][6]|[1][7][5]|[2][4][9]|
+7 |[5][1][8]|[3][9][7]|[4][6][2]|
+4 |[2][7][5]|[9][6][4]|[1][3][8]|
+  +---------+---------+---------+
+3 |[1][6][4]|[8][5][3]|[9][2][7]|
+8 |[6][2][9]|[4][1][8]|[5][7][3]|
+2 |[9][5][3]|[7][4][2]|[8][1][6]|
+  +---------+---------+---------+
+  
+  pasting the original... 
+  +---------+---------+---------+
+  |[7][3][1]|[5][2][9]|[6][8][4]|
+  |[4][5][9]|[8][3][6]|[7][2][1]|
+  |[8][2][6]|[4][7][1]|[3][5][9]|
+  +---------+---------+---------+
+  |[3][6][4]|[2][1][8]|[9][7][5]|
+  |[5][1][7]|[6][9][3]|[8][4][2]|
+  |[2][9][8]|[7][4][5]|[1][6][3]|
+  +---------+---------+---------+
+  |[1][7][5]|[9][8][4]|[2][3][6]|
+  |[6][8][3]|[1][5][2]|[4][9][7]|
+  |[9][4][2]|[3][6][7]|[5][1][8]|
+  +---------+---------+---------+
+
+Not the same! Though we've made the first row and first column identical by swapping, there are still issues; what's more is the swapped one has repetitions in blocks!
+Group theory approach might not be the way to go :C

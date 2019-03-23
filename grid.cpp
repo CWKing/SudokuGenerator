@@ -110,6 +110,9 @@ void grid::checkFamilyFSoP(cell* family) {
 																//potentials from all the remaining cells in the family. PROBLEM! We need to run the check again to be
 																//sure we catch any newly formed subfamilies, but avoid an infinite loop by reidentifying the one we
 																//just found... maybe a new field in the cell class designating it as already in a subfamily?
+																//NEW PROBLEM! A subfamily is not limited to how I had previously defined it; rather certain
+																//collections of cells can form a subfamily despite all cells neither sharing the same potentials
+																//nor same number of potentials; this makes the issue exceptionally harder to confront!
 		}
 	}
 };
