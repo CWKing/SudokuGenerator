@@ -28,3 +28,62 @@ Different FSoP and an attempt to explain them:
 	Family exclusion- A cell loses a potential because another cell in that family takes a number; potential lost is that number.
 	Symmetric lock- A cell loses one or more potentials because N cells, excluding it, in its family each contain the exact same N potentials; potentials lost are those N potentials.
 	Asymmetric lock- A cell loses one or more potentials because N cells, excluding it, in its family
+	
+Subfamily definition will need to be redefined to accommodate new observations (subfamilies can be formed without all members having exactly the same number of potentials)
+Since a completed sudoku puzzle contains exactly one number from 1 to 9 eactly once in each row and column, is it the case that a completed sudoku puzzle forms a "jumbled" operation table of an order 9 group? All order nine groups are isomorphic to either integers mod 9 or integers mod 3 cross integers mod 3, both of which are abelian, so maybe it's not too difficult to find out. If so, maybe use this concept to generate sudoku puzzles by re-jumbling the rows and columns, then putting the product of the rows and columns in the associated spots?
+
+A complete sudoku from previous attempt; was successful for this particular seed (0)
++---------+---------+---------+
+|[7][3][1]|[5][2][9]|[6][8][4]|
+|[4][5][9]|[8][3][6]|[7][2][1]|
+|[8][2][6]|[4][7][1]|[3][5][9]|
++---------+---------+---------+
+|[3][6][4]|[2][1][8]|[9][7][5]|
+|[5][1][7]|[6][9][3]|[8][4][2]|
+|[2][9][8]|[7][4][5]|[1][6][3]|
++---------+---------+---------+
+|[1][7][5]|[9][8][4]|[2][3][6]|
+|[6][8][3]|[1][5][2]|[4][9][7]|
+|[9][4][2]|[3][6][7]|[5][1][8]|
++---------+---------+---------+
+
+    a  b  c  d  e  f  g  h  i
+a |[7][3][1][5][2][9][6][8][4]|
+i |[4][5][9][8][3][6][7][2][1]|
+h |[8][2][6][4][7][1][3][5][9]|
+b |[3][6][4][2][1][8][9][7][5]|
+d |[5][1][7][6][9][3][8][4][2]|
+e |[2][9][8][7][4][5][1][6][3]|
+c |[1][7][5][9][8][4][2][3][6]|
+g |[6][8][3][1][5][2][4][9][7]|
+f |[9][4][2][3][6][7][5][1][8]|
+  
+  
+  reorganizing...
+    a  b  c  d  e  f  g  h  i
+a |[7][3][1][5][2][9][6][8][4]|
+b |[3][6][4][2][1][8][9][7][5]|
+c |[1][7][5][9][8][4][2][3][6]|
+d |[5][1][7][6][9][3][8][4][2]|
+e |[2][9][8][7][4][5][1][6][3]|
+f |[9][4][2][3][6][7][5][1][8]|
+g |[6][8][3][1][5][2][4][9][7]|
+h |[8][2][6][4][7][1][3][5][9]|
+i |[4][5][9][8][3][6][7][2][1]|
+
+not abelian; needs to be abelian! Bad labeling? Not defining of a group operation?
+
+    -  -  -  -  -  -  -  -  -
+- |[7][3][1][5][2][9][6][8][4]|
+- |[4][5][9][8][3][6][7][2][1]|
+- |[8][2][6][4][7][1][3][5][9]|
+- |[3][6][4][2][1][8][9][7][5]|
+- |[5][1][7][6][9][3][8][4][2]|
+- |[2][9][8][7][4][5][1][6][3]|
+- |[1][7][5][9][8][4][2][3][6]|
+- |[6][8][3][1][5][2][4][9][7]|
+- |[9][4][2][3][6][7][5][1][8]|
+
+
+
+

@@ -36,21 +36,21 @@ void grid::printGrid() const {
 ///End public member function grid class printGrid
 
 ///Definition public member function grid class checkColumns
-///Checks the columns of the grid for a distinct potential
+///Column family wrapper for checkFamilyFSoP
 void grid::checkColumnsFSoP() {
 	
 };
 ///End public member function grid class checkColumns
 
 ///Definition public member function grid class checkRows
-///Checks the rows of the grid for a distinct potential
+///Row family wrapper for checkFamilyFSoP
 void grid::checkRowsFSoP() {
 
 };
 ///End public member function grid class checkRows
 
 ///Definition public member function grid class checkBlocks
-///Checks the blocks of the grid for a distinct potential
+///Block family wrapper for checkFamilyFSoP
 void grid::checkBlocksFSoP() {
 
 };
@@ -59,12 +59,9 @@ void grid::checkBlocksFSoP() {
 ///Definition private member function grid class checkPotentialsSoleNum
 ///Checks the potentials of the passed cell and if it can only contain one number, pushes into the queue
 void grid::checkPotentialsSoleNum(cell &C) {
-	short truthCount = 0, tempIndex = -1;
+	short truthCount = 0;
 	for (short i = 0; i < 9; ++i)
-		if (C.getPotentials[i]) {
-			++truthCount;
-			tempIndex = i;
-		};
+		if (C.getPotentials[i]) ++truthCount;
 	if (truthCount == 1) {
 		this->awaiting_assignment.push(&C);
 	};
