@@ -8,9 +8,7 @@ using std::cout; using std::endl; using std::ostream;
 
 
 ///Definition cell class constructor
-cell::cell(short R, short C, short B) : number(0), row(R), column(C), block(B), byNecessity(false){
-	for(short i = 0; i < 9; ++i) this->potentials[i] = true;
-};
+cell::cell(short R, short C, short B) : row(R), column(C), block(B), number(0), potentials{true, true, true, true, true, true, true, true, true}, byNecessity(false), inSubfamily{ false, false, false } {};
 ///End cell class constructor
 
 ///Definition public member function cell class getColumn
@@ -89,15 +87,21 @@ void cell::setNecessityTrue() {
 ///Definition public member function cell class NP
 short cell::NP() const {
 	short numPot = 0;
-	for (size_t i = 0; i < 9; ++i) numPot += static_cast<short>(this->potentials[i]);
+	for (short i = 0; i < 9; ++i) numPot += static_cast<short>(this->potentials[i]);
 	return numPot;
 };
 ///End public member function cell class NP
 
+///Definition public member function cell class toggleSubfmailyBool
+void cell::toggleSubfamilyBool(RCB rcb){
+	this->inSubfamily[rcb] = !(this->inSubfamily[rcb]);
+};
+///End public member function cell class toggleSubfamilyBool
+
 ///Definition cell class member operator== overload
 bool cell::operator==(const cell& rhs) const {
 	if (this->NP() != rhs.NP()) return false;
-	for (size_t i = 0; i < 9; ++i) if (this->potentials[i] != rhs.potentials[i]) return false;
+	for (short i = 0; i < 9; ++i) if (this->potentials[i] != rhs.potentials[i]) return false;
 	return true;
 };
 ///End cell class operator== overload
@@ -111,3 +115,10 @@ ostream& operator<<(ostream& out, cell C) {
 	return out;
 };
 ///End cell class operator<< overload
+
+///Definition cell class non-member operator+ overload
+short* operator+(const cell& lhs, const cell& rhs) {
+	short* sequence = new short[9] {0, 0, 0, 0, 0, 0, 0, 0, 0};					//Dynamic allocation of memory returned from function; dangerous! Don't forget to release!
+	for (short i = 0; i < 9; ++i) sequence[i] = static_cast<short>(lhs.getPotentials[i]) + static_cast<short>(rhs.getPotentials[i]);
+	return sequence;
+};

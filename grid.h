@@ -12,9 +12,9 @@ class grid {
 		std::vector<cell> const * const access; //For accessing but not modifying the contents of GRID; for debugging mostly
 	private:
 		void initializeGrid();					//Main handler for constructing the sudoku grid
-		void checkFamilyFSoP(cell*);			//Main FSoP check handler
-		void checkPotentialsSoleNum(cell &C);	//Main FSoN check handler
-		void changePotentials(cell& CELL);
+		void checkFamilyFSoP(cell*, RCB);		//Main FSoP check handler
+		void checkPotentialsSoleNum(cell&);		//Main FSoN check handler
+		void changePotentials(cell&);
 		cell* GRIDRF[9][9];						//Grid Row First (ie, first index is row, second index is column)
 		cell* GRIDBB[9][9];						//Grid By Block (ie, first index is block, second index is the subindex in the block)
 		std::vector<cell> GRID;					//Grid as just an 81 cell vector; the elements of both GRIDRF and GRIDBB point to the elements in this
