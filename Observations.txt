@@ -30,9 +30,22 @@ Different FSoP and an attempt to explain them:
 	Subfamily lock- A cell loses one or more potentials because N cells, excluding it, in its family form a subfamily. The potentials lost are the accumulative potentials of these N cells.
 
 Identifying Subfamily locks:
-	
-	
-Since a completed sudoku puzzle contains exactly one number from 1 to 9 eactly once in each row and column, is it the case that a completed sudoku puzzle forms a "jumbled" operation table of an order 9 group? All order nine groups are isomorphic to either integers mod 9 or integers mod 3 cross integers mod 3, both of which are abelian, so maybe it's not too difficult to find out. If so, maybe use this concept to generate sudoku puzzles by re-jumbling the rows and columns, then putting the product of the rows and columns in the associated spots?
+	It appears to be the case, but it is not proven, that if you have a set of 1<k<9 cells, piece-wise sum their potentials (assuming the potentials are given by a container of int-like data-types), and receive a list that contains no 1's, contains 9-k 0's (or k non-zeros), and (though this should never happen) no number greater than k, then this set of k cells forms a subfamily.
+
+	ex. We will use the letters a, b, and c to show all the possible distinct subfamilies of both 2 cells and 3 cells ([a b c] will denote a cell with potentials a, b, and c);
+
+	2-cell subfamily: ([a b], [a b]) This is the only sub-family type for two cells. If one were to add the potentials piecewise of these two cells, one would get two 2's, and seven 0's. (If we were to say that the sequence 1 1 1 0 0 0 0 0 denotes a cell having potentials 1, 2, and 3, and suppose a=1, b=2, and c=3, then we would have: 
+	1 1 0 0 0 0 0 0 0 + 1 1 0 0 0 0 0 0 0 = 2 2 0 0 0 0 0 0 0)
+		([a b c], [a b]) does not form a 2-cell subfamily as the piecewise sum of potentials both contains a 1 (from the single c) and more non-zeros than cells (Similar as above, we would have: 1 1 1 0 0 0 0 0 0 + 1 1 0 0 0 0 0 0 0 = 2 2 1 0 0 0 0 0 0)
+
+	3-cell subfamilies: ([a b c], [a b c], [a b c]), ([a b c], [a b c], [a b]), ([a b c], [a b], [a c]), ([a b], [b c], [a c]) (3 3 3; 3 3 2; 3 2 2; 2 2 2 (0's suppressed))
+
+	This pattern appears to hold with 4-cell subfamilies, but the same sequence of integers is not unique, ex:
+		([a b c d], [a b c d], [a b c d], [a b]) & ([a b c d], [a b c d], [a b c], [a b d]) have the same sequence (up to ordering) but aren't identical (both are 4 4 3 3)
+
+	Under the assumption this pattern holds, we will call the sequence created from the piecewise sum of the potentials of a set of k cells the set's SIGNATURE. To identify a subfamily, we need to check in each family every possible set (up to ordering) of cells and from each set, if its signature matches that of a subfamily. Once a subfamily has been identified, we will need to have information regarding what family the subfamily resides in, and the cells which comprise the subfamily so that we may perform the proper potential exclusion from the remaining cells in the family.
+
+Since a completed sudoku puzzle contains exactly one number from 1 to 9 exactly once in each row and column, is it the case that a completed sudoku puzzle forms a "jumbled" operation table of an order 9 group? All order nine groups are isomorphic to either integers mod 9 or integers mod 3 cross integers mod 3, both of which are abelian, so maybe it's not too difficult to find out. If so, maybe use this concept to generate sudoku puzzles by re-jumbling the rows and columns, then putting the product of the rows and columns in the associated spots?
 
 A complete sudoku from previous attempt; was successful for this particular seed (0)
 +---------+---------+---------+
@@ -337,3 +350,114 @@ After putting back the demarcations...
 
 Not the same! Though we've made the first row and first column identical by swapping, there are still issues; what's more is the swapped one has repetitions in blocks!
 Group theory approach might not be the way to go :C
+
+Just for curiosities sake (the rover, of course), what happens if we "unjumble" the original backwards?
+    a  b  c  d  e  f  g  h  i
+a |[7][3][1][5][2][9][6][8][4]|
+b |[4][5][9][8][3][6][7][2][1]|
+c |[8][2][6][4][7][1][3][5][9]|
+d |[3][6][4][2][1][8][9][7][5]|
+e |[5][1][7][6][9][3][8][4][2]|
+f |[2][9][8][7][4][5][1][6][3]|
+g |[1][7][5][9][8][4][2][3][6]|
+h |[6][8][3][1][5][2][4][9][7]|
+i |[9][4][2][3][6][7][5][1][8]|
+
+swap columns h and i...
+    a  b  c  d  e  f  g  i  h
+a |[7][3][1][5][2][9][6][4][8]|
+b |[4][5][9][8][3][6][7][1][2]|
+c |[8][2][6][4][7][1][3][9][5]|
+d |[3][6][4][2][1][8][9][5][7]|
+e |[5][1][7][6][9][3][8][2][4]|
+f |[2][9][8][7][4][5][1][3][6]|
+g |[1][7][5][9][8][4][2][6][3]|
+h |[6][8][3][1][5][2][4][7][9]|
+i |[9][4][2][3][6][7][5][8][1]|
+
+swap columns a and i...
+    i  b  c  d  e  f  g  a  h
+a |[4][3][1][5][2][9][6][7][8]|
+b |[1][5][9][8][3][6][7][4][2]|
+c |[9][2][6][4][7][1][3][8][5]|
+d |[5][6][4][2][1][8][9][3][7]|
+e |[2][1][7][6][9][3][8][5][4]|
+f |[3][9][8][7][4][5][1][2][6]|
+g |[6][7][5][9][8][4][2][1][3]|
+h |[7][8][3][1][5][2][4][6][9]|
+i |[8][4][2][3][6][7][5][9][1]|
+
+swap columns d and f...
+    i  b  c  f  e  d  g  a  h
+a |[4][3][1][9][2][5][6][7][8]|
+b |[1][5][9][6][3][8][7][4][2]|
+c |[9][2][6][1][7][4][3][8][5]|
+d |[5][6][4][8][1][2][9][3][7]|
+e |[2][1][7][3][9][6][8][5][4]|
+f |[3][9][8][5][4][7][1][2][6]|
+g |[6][7][5][4][8][9][2][1][3]|
+h |[7][8][3][2][5][1][4][6][9]|
+i |[8][4][2][7][6][3][5][9][1]|
+
+swap columns i and e...
+    e  b  c  f  i  d  g  a  h
+a |[2][3][1][9][4][5][6][7][8]|
+b |[3][5][9][6][1][8][7][4][2]|
+c |[7][2][6][1][9][4][3][8][5]|
+d |[1][6][4][8][5][2][9][3][7]|
+e |[9][1][7][3][2][6][8][5][4]|
+f |[4][9][8][5][3][7][1][2][6]|
+g |[8][7][5][4][6][9][2][1][3]|
+h |[5][8][3][2][7][1][4][6][9]|
+i |[6][4][2][7][8][3][5][9][1]|
+
+swap columns b and f...
+    e  f  c  b  i  d  g  a  h
+a |[2][9][1][3][4][5][6][7][8]|
+b |[3][6][9][5][1][8][7][4][2]|
+c |[7][1][6][2][9][4][3][8][5]|
+d |[1][8][4][6][5][2][9][3][7]|
+e |[9][3][7][1][2][6][8][5][4]|
+f |[4][5][8][9][3][7][1][2][6]|
+g |[8][4][5][7][6][9][2][1][3]|
+h |[5][2][3][8][7][1][4][6][9]|
+i |[6][7][2][4][8][3][5][9][1]|
+
+swap columns e and c...
+    c  f  e  b  i  d  g  a  h
+a |[1][9][2][3][4][5][6][7][8]|
+b |[9][6][3][5][1][8][7][4][2]|
+c |[6][1][7][2][9][4][3][8][5]|
+d |[4][8][1][6][5][2][9][3][7]|
+e |[7][3][9][1][2][6][8][5][4]|
+f |[8][5][4][9][3][7][1][2][6]|
+g |[5][4][8][7][6][9][2][1][3]|
+h |[3][2][5][8][7][1][4][6][9]|
+i |[2][7][6][4][8][3][5][9][1]|
+
+swap columns c and f...
+    f  c  e  b  i  d  g  a  h
+a |[9][1][2][3][4][5][6][7][8]|
+b |[6][9][3][5][1][8][7][4][2]|
+c |[1][6][7][2][9][4][3][8][5]|
+d |[8][4][1][6][5][2][9][3][7]|
+e |[3][7][9][1][2][6][8][5][4]|
+f |[5][8][4][9][3][7][1][2][6]|
+g |[4][5][8][7][6][9][2][1][3]|
+h |[2][3][5][8][7][1][4][6][9]|
+i |[7][2][6][4][8][3][5][9][1]|
+
+swap rows b and c...
+    f  c  e  b  i  d  g  a  h
+a |[9][1][2][3][4][5][6][7][8]|
+b |[6][9][3][5][1][8][7][4][2]|
+c |[1][6][7][2][9][4][3][8][5]|
+d |[8][4][1][6][5][2][9][3][7]|
+e |[3][7][9][1][2][6][8][5][4]|
+f |[5][8][4][9][3][7][1][2][6]|
+g |[4][5][8][7][6][9][2][1][3]|
+h |[2][3][5][8][7][1][4][6][9]|
+i |[7][2][6][4][8][3][5][9][1]|
+
+Just un-jumbling the columns reveals that there are incongruities in the table to form an Z/9Z arithmetic with each number being "itself" so-to-speak; it may be the case that we CAN
+get back to Z/9Z by "swapping" the identity of the numbers; eg making all 9s become 1s, 2s become 7s etc. We'd have to find the particular automorphism that worked though.
