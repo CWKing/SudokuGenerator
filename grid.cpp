@@ -10,8 +10,7 @@ short unitStepFunction(short number, short switchpoint) {
 ///End function unitStepFunction
 
 ///Definition grid class default constructor
-///Need to use initializer list to initialize the constant pointer to a constant cell vector access
-grid::grid() : access(&GRID) {
+grid::grid() {
 	GRID.reserve(81); //Need to preemptively reserve space BUT not initialize the cells to prevent both const problems and vector memory relocation
 	poteCells.reserve(81);
 	initializeGrid();
@@ -35,38 +34,63 @@ void grid::printGrid() const {
 };
 ///End public member function grid class printGrid
 
-///Definition public member function grid class checkColumns
-///Column family wrapper for checkFamilyFSoP
-void grid::checkColumnsFSoP() {
-	//checkFamilyFSoP(, COLUMN)
-};
-///End public member function grid class checkColumns
-
-///Definition public member function grid class checkRows
+///Definition public member function grid class checkRowsFSoP
 ///Row family wrapper for checkFamilyFSoP
-void grid::checkRowsFSoP() {
-	//checkFamilyFSoP(, ROW)
+void grid::checkRowsFSoP(cell& C) {
+	checkFamilyFSoP(this->GRIDRF[C.getRow()], ROW);
 };
-///End public member function grid class checkRows
+///End public member function grid class checkRowsFSoP
 
-///Definition public member function grid class checkBlocks
+///Definition public member function grid class checkColumnsFSoP
+///Column family wrapper for checkFamilyFSoP
+void grid::checkColumnsFSoP(cell& C) {
+	checkFamilyFSoP(this->GRIDCF[C.getColumn()], COLUMN);
+};
+///End public member function grid class checkColumnsFSoP
+
+///Definition public member function grid class checkBlocksFSoP
 ///Block family wrapper for checkFamilyFSoP
-void grid::checkBlocksFSoP() {
-	//checkFamilyFSoP(, BLOCK)
+void grid::checkBlocksFSoP(cell& C) {
+	checkFamilyFSoP(this->GRIDBB[C.getBlock()], BLOCK);
 };
-///End public member function grid class checkBlocks
+///End public member function grid class checkBlocksFSoP
 
-///Definition private member function grid class checkPotentialsSoleNum
-///Checks the potentials of the passed cell and if it can only contain one number, pushes into the queue
-void grid::checkPotentialsSoleNum(cell &C) {
-	short truthCount = 0;
-	for (short i = 0; i < 9; ++i)
-		if (C.getPotentials[i]) ++truthCount;
-	if (truthCount == 1) {
-		this->awaiting_assignment.push(&C);
+///Definition public member function grid class checkRowsFSoN
+///Row family wrapper for checkFamilyFSoP
+void grid::checkRowsFSoN(cell& C) {
+	checkFamilyFSoN(this->GRIDRF[C.getRow()], ROW);
+};
+///End public member function grid class checkRowsFSoN
+
+///Definition public member function grid class checkColumnsFSoN
+///Column family wrapper for checkFamilyFSoP
+void grid::checkColumnsFSoN(cell& C) {
+	checkFamilyFSoN(this->GRIDCF[C.getColumn()], COLUMN);
+};
+///End public member function grid class checkColumnsFSoN
+
+///Definition public member function grid class checkBlocksFSoN
+///Block family wrapper for checkFamilyFSoP
+void grid::checkBlocksFSoN(cell& C) {
+	checkFamilyFSoN(this->GRIDBB[C.getBlock()], BLOCK);
+};
+///End public member function grid class checkBlocksFSoN
+
+///Definition public member function grid class getpoteCellSize
+short grid::getpoteCellSize() const {
+	return this->poteCells.size();
+};
+///Definition public member function grid class getpoteCellSize
+
+///
+void grid::workThroughQueue() {
+	while (!(this->awaiting_assignment.empty())) {
+		(this->awaiting_assignment.front())->setNumber();
+		(this->awaiting_assignment.front())->setNecessityTrue();
+		this->awaiting_assignment.pop();
 	};
 };
-///End private member function grid class checkPotentials
+///
 
 ///Definition private member function grid class initializeGrid
 ///Initializes the grid; called by the default constructor
@@ -78,7 +102,7 @@ void grid::initializeGrid() {
 			blockNum = (static_cast<int>(blockIt / 3.) % 3) + (3 * static_cast<int>(static_cast<int>(blockIt / 9.) / 3.));
 			blockSubIndex = (blockIt % 3) + 3 * (static_cast<int>(static_cast<int>(blockIt / 3.) / 3.) % 3 * (1 - unitStepFunction(blockIt, 27) + unitStepFunction(blockIt, 36)));
 			GRID.push_back(cell(ROW, COL, blockNum));
-			GRIDRF[ROW][COL] = (GRIDBB[blockNum][blockSubIndex] = &GRID[blockIt]);
+			GRIDRF[ROW][COL] = (GRIDCF[COL][ROW] = (GRIDBB[blockNum][blockSubIndex] = &GRID[blockIt]));
 			poteCells.push_back(GRIDRF[ROW][COL]);
 			blockIt += 1;
 		};
@@ -88,12 +112,24 @@ void grid::initializeGrid() {
 
 ///Definition private member function grid class checkFamilyFSoP
 ///Main handler for checking FSoP. Takes a family and performs the more complicated FSoP checks.
-///As after changing potentials, previous checks become invalidated, we will have to restart the check from the very beginning
-///everytime we have a positive result; this will get messy.
-void grid::checkFamilyFSoP(cell* family, RCB rcb) {
-	
+///As after changing potentials, previous checks become invalidated (new subfamilies could have been created), we will have to restart the check from the very beginning
+///everytime we have a positive result; furthermore, it MAY be possible for a single cell to be in multiple subfamilies (one from each family it belongs), so we need
+///to be sure when checking for exclusion based on already being in a subfamily, we know which family we are considering.
+///cell** is to be interpreted as an array of pointers to cells
+void grid::checkFamilyFSoP(cell** family, RCB rcb) {
+	//Impliment FSoP checker here!
 };
 ///End private member function grid class checkFamilyFSoP
+
+///Definition private member function grid class checkFamilyFSoN
+///Checks the potentials of the passed cell and if it can only contain one number, pushes into the queue
+///If this is not the case, then checks this cell against all cells in each of its three families to see
+///if it is the only cell which may contain a particular number
+void grid::checkFamilyFSoN(cell** family, RCB rcb) {
+	//Impliment FSoN checker here!
+};
+//Might need to change this to act immediately if issues arrise from a cell waiting with 1 potential being flagged in a subfamily by the FSoP checker
+///End private member function grid class checkFamilyFSoN
 
 ///Definition private member function grid class changePotentials
 ///Is past a reference to a cell then changes the potential of the number the cell contains to false of all associated cells
