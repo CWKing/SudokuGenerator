@@ -1,6 +1,13 @@
+#ifndef GRID_H
+#define GRID_H
+
 #include "cell.h"
 //#include "others.h" //Might not need this
 #include <queue>
+
+///THE ONLY SEMI-GLOBAL VARIABLE
+extern bool debug;
+///DO NOT PANIC
 
 ///
 class CellNum {
@@ -11,7 +18,6 @@ class CellNum {
 	friend class grid;
 };
 ///
-
 
 ///potentialSumContainer helper class declaration
 ///Intention is to be used for FSoP checking
@@ -61,6 +67,7 @@ class grid {
 		friend class cell;	//Might not be necessary
 };
 
+#endif // !GRID_H
 /*
 	Blocks and block subindecies are designated left-to-right, row-by-row
 	in the example below, the number in  each cell is the block subindex of

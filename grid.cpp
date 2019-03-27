@@ -1,7 +1,5 @@
 #include "grid.h"
 
-using std::cout; using std::endl;
-
 ///
 potentialSumContainer::potentialSumContainer() : sum{ 0, 0, 0, 0, 0, 0, 0, 0 } {};
 ///
@@ -40,18 +38,21 @@ grid::grid() {
 ///Definition public member function grid class printGrid
 void grid::printGrid() const {
 	for (short row = 0; row < 9; row++) {
-		if (row % 3 == 0) cout << "+---------+---------+---------+\n";
+		if (row % 3 == 0) std::cout << "+---------+---------+---------+\n";
 		for (short col = 0; col < 9; col++) {
-			if (col % 3 == 0) cout << "|";
-			cout << "[";
-			//if (this->GRIDRF[row][col]->getNecessity() || !(this->GRIDRF[row][col]->getNumber())) cout << " ";
-			if (!(this->GRIDRF[row][col]->getNumber())) cout << " "; //The above line is what is wanted; remove this one when done
-			else cout << GRIDRF[row][col]->getNumber();
-			cout << "]";
+			if (col % 3 == 0) std::cout << "|";
+			std::cout << "[";
+			//debug
+			if (debug && GRIDRF[row][col]->getNumber()) std::cout << GRIDRF[row][col]->getNumber();
+			else if (debug && !(GRIDRF[row][col]->getNumber())) std::cout << " ";
+			//
+			else if (this->GRIDRF[row][col]->getNecessity()) std::cout << " ";
+			else std::cout << GRIDRF[row][col]->getNumber();
+			std::cout << "]";
 		};
-		cout << "|" << endl;
+		std::cout << "|" << std::endl;
 	};
-	cout << "+---------+---------+---------+\n";
+	std::cout << "+---------+---------+---------+\n";
 };
 ///End public member function grid class printGrid
 
@@ -108,6 +109,7 @@ short grid::getpoteCellIndex(const cell& toCheck) const {
 	for (short i = 0; i < this->getpoteCellSize(); ++i)
 		if (this->poteCells[i]->getRow() == toCheck.getRow() && this->poteCells[i]->getColumn() == toCheck.getColumn())
 			return i;
+	return -1;	//This should never be passed, but if it does the prog should crash... hopefully.
 };
 ///
 
@@ -117,7 +119,6 @@ void grid::workThroughQueue() {
 		this->poteCells.erase(this->poteCells.begin() + this->getpoteCellIndex(*(this->awaiting_assignment.front().CELL)));
 		(this->awaiting_assignment.front().CELL)->setNumber(this->awaiting_assignment.front().NUMBER);
 		(this->awaiting_assignment.front().CELL)->setNecessityTrue();
-		//this->changePotentials(*(this->awaiting_assignment.front().CELL));
 		this->initiateAllChecks(this->awaiting_assignment.front().CELL);
 		this->awaiting_assignment.pop();
 	};
@@ -131,22 +132,22 @@ void grid::assignRandom() {
 	short row = this->poteCells[randomIndex]->getRow();
 	short column = this->poteCells[randomIndex]->getColumn();
 	//debug
-	std::cout << "Current number of remaining cells to fill: " << this->getpoteCellSize() << "\nCell [" << row << ", " << column << "] chosen from poteCells index " << randomIndex << std::endl;
+	if (debug) std::cout << "Current number of remaining cells to fill: " << this->getpoteCellSize() << "\nCell [" << row << ", " << column << "] chosen from poteCells index " << randomIndex << std::endl;
 	//
 	this->poteCells.erase(poteCells.begin() + randomIndex);
 	std::vector<short> potentialNumbers;
 	//debug
-	std::cout << "Cell potentials: ";
+	if (debug) std::cout << "Cell potentials: ";
 	//
 	for (short potentialNumber = 0; potentialNumber < 9; ++potentialNumber) {
 		//debug
-		std::cout << this->GRIDRF[row][column]->getPotential(potentialNumber) << " ";
+		if (debug) std::cout << this->GRIDRF[row][column]->getPotential(potentialNumber) << " ";
 		//
 		if (this->GRIDRF[row][column]->getPotential(potentialNumber)) potentialNumbers.push_back(potentialNumber + 1);
 	}
 	randomIndex = std::rand() % potentialNumbers.size();
 	//debug
-	std::cout << "\nSetting number " << potentialNumbers[randomIndex] << " into cell [" << row << ", " << column << "]" << std::endl;
+	if (debug) std::cout << "\nSetting number " << potentialNumbers[randomIndex] << " into cell [" << row << ", " << column << "]" << std::endl;
 	//
 	this->GRIDRF[row][column]->setNumber(potentialNumbers[randomIndex]);
 	this->changePotentials(*(this->GRIDRF[row][column]));
@@ -211,7 +212,7 @@ void grid::checkFamilyFSoN(cell** family) {
 		if (hit_count == 1) {
 			family[cellInFamily]->setAwaitingAssignmentTrue();
 			//Debug
-			std::cout << "From lone potential check, pushing cell [" << family[cellInFamily]->getRow() << ", " << family[cellInFamily]->getColumn() << "] into queue with number " << temp_index + 1 << std::endl;
+			if (debug) std::cout << "From lone potential check, pushing cell [" << family[cellInFamily]->getRow() << ", " << family[cellInFamily]->getColumn() << "] into queue with number " << temp_index + 1 << std::endl;
 			//
 			this->changePotentials(family[cellInFamily]->getRow(), family[cellInFamily]->getColumn(), family[cellInFamily]->getBlock(), temp_index + 1);
 			this->awaiting_assignment.push(CellNum(family[cellInFamily], temp_index + 1));
@@ -229,16 +230,14 @@ void grid::checkFamilyFSoN(cell** family) {
 		if (hit_count == 1) {
 			family[temp_index]->setAwaitingAssignmentTrue();
 			//Debug
-			std::cout << "From isolated value check, pushing cell [" << family[temp_index]->getRow() << ", " << family[temp_index]->getColumn() << "] into queue with number " << potentialIndex + 1 << std::endl;
+			if (debug) std::cout << "From isolated value check, pushing cell [" << family[temp_index]->getRow() << ", " << family[temp_index]->getColumn() << "] into queue with number " << potentialIndex + 1 << std::endl;
 			//
 			this->changePotentials(family[temp_index]->getRow(), family[temp_index]->getColumn(), family[temp_index]->getBlock(), potentialIndex + 1);
 			this->awaiting_assignment.push(CellNum(family[temp_index], potentialIndex + 1));
-			break;	//Break required to be sure we don't catch the same "isolated" value again in the same family while waiting that numbers assignment
 		}
 	}
 };
-//Problem! Still catching the same "isolated" value; likely the result of cross family member; ie, cells which share two families (ie, row and block or column and block)
-//For these members, we are ignoring other cells in the family awaiting assignment, so we are still catching values as "isolated" though they are to be assigned 
+
 ///End private member function grid class checkFamilyFSoN
 
 ///Definition private member function grid class changePotentials
