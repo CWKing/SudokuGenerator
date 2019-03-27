@@ -30,30 +30,33 @@ class grid {
 	public:
 		grid();
 		void printGrid() const;
-		void checkRowsFSoP(const cell&);				///Wrapper for checkFamilyFSoP to check row families
-		void checkColumnsFSoP(const cell&);				///Wrapper for checkFamilyFSoP to check column families
-		void checkBlocksFSoP(const cell&);				///Wrapper for checkFamilyFSoP to check block families
-		void checkRowsFSoN(const cell&);				///Wrapper for checkFamilyFSoN to check row families
-		void checkColumnsFSoN(const cell&);				///Wrapper for checkFamilyFSoN to check column families
-		void checkBlocksFSoN(const cell&);				///Wrapper for checkFamilyFSoN to check block families
-		short getpoteCellSize() const;					///To get the number of potential cells which still need to have a number assigned
-		short getpoteCellIndex(const cell&) const;		///Get the index of a cell in the poteCells vector; used for deleting those from the vector
-		void workThroughQueue();						///Iterate through the awaiting assignment queue, assigning numbers to cells
-		void assignRandom();							///Assign a random cell from poteCells one of its random potentials
-		void initiateAllChecks(const cell*);			///Initiate all checks on a given cell and its families
+		void checkRowsFSoP(const cell&);					///Wrapper for checkFamilyFSoP to check row families
+		void checkColumnsFSoP(const cell&);					///Wrapper for checkFamilyFSoP to check column families
+		void checkBlocksFSoP(const cell&);					///Wrapper for checkFamilyFSoP to check block families
+		void checkRowsFSoN(const cell&);					///Wrapper for checkFamilyFSoN to check row families
+		void checkColumnsFSoN(const cell&);					///Wrapper for checkFamilyFSoN to check column families
+		void checkBlocksFSoN(const cell&);					///Wrapper for checkFamilyFSoN to check block families
+		short getpoteCellSize() const;						///To get the number of potential cells which still need to have a number assigned
+		short getpoteCellIndex(const cell&) const;			///Get the index of a cell in the poteCells vector; used for deleting those from the vector
+		void workThroughQueue();							///Iterate through the awaiting assignment queue, assigning numbers to cells
+		void assignRandom();								///Assign a random cell from poteCells one of its random potentials
+		void initiateAllChecks(const cell*);				///Initiate all checks on a given cell and its families
 
 	private:
-		void initializeGrid();							///Main handler for constructing the sudoku grid
-		void checkFamilyFSoP(cell**, RCB);				///Main FSoP check handler
-		void checkFamilyFSoN(cell**);					///Main FSoN check handler
-		void changePotentials(cell&);
-		cell* GRIDRF[9][9];								///Grid Row First (ie, first index is row, second index is column)
-		cell* GRIDCF[9][9];								///Grid Column First (ie, first index is column, second index is row. Simplifies FSoP checking; trust me)
-		cell* GRIDBB[9][9];								///Grid By Block (ie, first index is block, second index is the subindex in the block)
-		std::vector<cell> GRID;							///Grid as just an 81 cell vector; the elements of both GRIDRF and GRIDBB point to the elements in this
-		std::vector<cell*> poteCells;					///Vector of pointers to cells containing the remaining potential occupiable cells; when doing the random assigning
-														///of numbers, first a cell is chosen from here and then one of its potentials is randomly chosen
-		std::queue<CellNum> awaiting_assignment;		///To hold a tuple of a cell and number; the cell is awaiting assignment of that number
+		void initializeGrid();								///Main handler for constructing the sudoku grid
+		void checkFamilyFSoP(cell**, RCB);					///Main FSoP check handler
+		void checkFamilyFSoN(cell**);						///Main FSoN check handler
+		void changePotentials(cell&);						///Takes a reference to a cell and changes the potentials of all the cells in the passed cells families
+															///to exclude that cells held number
+		void changePotentials(short, short, short, short);	///To change the potentials of all cells in the families associated with the first 3 shorts (R, C, B)
+															///to exclude the number passed by the fourth short
+		cell* GRIDRF[9][9];									///Grid Row First (ie, first index is row, second index is column)
+		cell* GRIDCF[9][9];									///Grid Column First (ie, first index is column, second index is row. Simplifies FSoP checking; trust me)
+		cell* GRIDBB[9][9];									///Grid By Block (ie, first index is block, second index is the subindex in the block)
+		std::vector<cell> GRID;								///Grid as just an 81 cell vector; the elements of both GRIDRF and GRIDBB point to the elements in this
+		std::vector<cell*> poteCells;						///Vector of pointers to cells containing the remaining potential occupiable cells; when doing the random
+															///assigning of numbers, first a cell is chosen from here and then one of its potentials is randomly chosen
+		std::queue<CellNum> awaiting_assignment;			///To hold a tuple of a cell and number; the cell is awaiting assignment of that number
 
 		friend class cell;	//Might not be necessary
 };

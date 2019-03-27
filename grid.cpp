@@ -126,6 +126,7 @@ void grid::workThroughQueue() {
 
 ///Definition public member function grid class assignRandom
 void grid::assignRandom() {
+	if (!this->getpoteCellSize()) return;
 	short randomIndex = std::rand() % this->getpoteCellSize();
 	short row = this->poteCells[randomIndex]->getRow();
 	short column = this->poteCells[randomIndex]->getColumn();
@@ -212,6 +213,7 @@ void grid::checkFamilyFSoN(cell** family) {
 			//Debug
 			std::cout << "From lone potential check, pushing cell [" << family[cellInFamily]->getRow() << ", " << family[cellInFamily]->getColumn() << "] into queue with number " << temp_index + 1 << std::endl;
 			//
+			this->changePotentials(family[cellInFamily]->getRow(), family[cellInFamily]->getColumn(), family[cellInFamily]->getBlock(), temp_index + 1);
 			this->awaiting_assignment.push(CellNum(family[cellInFamily], temp_index + 1));
 		}
 	}
@@ -229,6 +231,7 @@ void grid::checkFamilyFSoN(cell** family) {
 			//Debug
 			std::cout << "From isolated value check, pushing cell [" << family[temp_index]->getRow() << ", " << family[temp_index]->getColumn() << "] into queue with number " << potentialIndex + 1 << std::endl;
 			//
+			this->changePotentials(family[temp_index]->getRow(), family[temp_index]->getColumn(), family[temp_index]->getBlock(), potentialIndex + 1);
 			this->awaiting_assignment.push(CellNum(family[temp_index], potentialIndex + 1));
 			break;	//Break required to be sure we don't catch the same "isolated" value again in the same family while waiting that numbers assignment
 		}
@@ -241,10 +244,17 @@ void grid::checkFamilyFSoN(cell** family) {
 ///Definition private member function grid class changePotentials
 ///Is past a reference to a cell then changes the potential of the number the cell contains to false of all cells in that cells families
 void grid::changePotentials(cell& CELL) {
+	changePotentials(CELL.getRow(), CELL.getColumn(), CELL.getBlock(), CELL.getNumber());
+};
+///End private member function grid class changePotentials
+
+///Definition private member function grid class changePotentials
+///Is past four shorts (Row, Column, Block, Number) then changes the potential of the number to false of all cells in those families
+void grid::changePotentials(short R, short C, short B, short N) {
 	for (short i = 0; i < 9; ++i) {
-		GRIDRF[CELL.getRow()][i]->setPotentialFalse(CELL.getNumber() - 1);
-		GRIDRF[i][CELL.getColumn()]->setPotentialFalse(CELL.getNumber() - 1);
-		GRIDBB[CELL.getBlock()][i]->setPotentialFalse(CELL.getNumber() - 1);
+		GRIDRF[R][i]->setPotentialFalse(N - 1);
+		GRIDRF[i][C]->setPotentialFalse(N - 1);
+		GRIDBB[B][i]->setPotentialFalse(N - 1);
 	};
 };
 ///End private member function grid class changePotentials
