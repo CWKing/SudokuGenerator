@@ -8,7 +8,7 @@ void main() {
 	grid newGrid;
 	while (newGrid.getpoteCellSize() > 0) {
 		newGrid.workThroughQueue();
-		//newGrid.assignRandom();
+		newGrid.assignRandom();
 	};
 	newGrid.printGrid();
 

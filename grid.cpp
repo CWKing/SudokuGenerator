@@ -19,7 +19,7 @@ void potentialSumContainer::reset() { for (short i = 0; i < 9; ++i) sum[i] = 0; 
 
 ///
 ///Piecewise addition of the potentials in the cells used for generating cell set signatures which are intended ot be used in the FSoP checker
-potentialSumContainer& potentialSumContainer::operator+=(const cell* rhs) { for (short i = 0; i < 9; ++i) this->sum[i] += rhs->getPotential[i]; };
+potentialSumContainer& potentialSumContainer::operator+=(const cell* rhs) { for (short i = 0; i < 9; ++i) this->sum[i] += rhs->getPotential(i); return *this; };
 ///
 
 ///Definition function unitStepFunction
@@ -188,7 +188,7 @@ void grid::checkFamilyFSoN(cell** family) {
 		if (family[cellInFamily]->getNumber() || family[cellInFamily]->isAwaitingAssignment()) continue;
 		temp_index = hit_count = 0;
 		for (short potentialIndex = 0; potentialIndex < 9; ++potentialIndex)
-			if (family[cellInFamily]->getPotential[potentialIndex]) {
+			if (family[cellInFamily]->getPotential(potentialIndex)) {
 				temp_index = potentialIndex;
 				++hit_count;
 			}
@@ -201,7 +201,7 @@ void grid::checkFamilyFSoN(cell** family) {
 		temp_index = hit_count = 0;
 		for (short cellInFamily = 0; cellInFamily < 9; ++cellInFamily) {
 			if (family[cellInFamily]->getNumber() || family[cellInFamily]->isAwaitingAssignment()) continue;
-			if (family[cellInFamily]->getPotential[potentialIndex]) {
+			if (family[cellInFamily]->getPotential(potentialIndex)) {
 				temp_index = cellInFamily;
 				++hit_count;
 			}

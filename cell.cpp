@@ -90,7 +90,7 @@ void cell::toggleSubfamilyBool(RCB rcb){
 ///Definition cell class member operator== overload
 bool cell::operator==(const cell& rhs) const {
 	if (this->NP() != rhs.NP()) return false;
-	for (short i = 0; i < 9; ++i) if (this->potentials[i] != rhs.getPotential[i]) return false;
+	for (short i = 0; i < 9; ++i) if (this->potentials[i] != rhs.getPotential(i)) return false;
 	return true;
 };
 ///End cell class operator== overload
