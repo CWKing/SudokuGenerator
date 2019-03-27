@@ -2,16 +2,40 @@
 //#include "others.h" //Might not need this
 #include <queue>
 
+///
+class CellNum {
+	CellNum(cell* _CELL, short _NUMBER) : CELL(_CELL), NUMBER(_NUMBER) {};
+	cell* CELL;
+	short NUMBER;
+
+	friend class grid;
+};
+///
+
+
+///potentialSumContainer helper class declaration
+///Intention is to be used for FSoP checking
+class potentialSumContainer {
+	potentialSumContainer();
+	short hasOne();
+	void reset();
+	potentialSumContainer& operator+=(const cell*);
+	short sum[9];
+
+	friend class grid;
+};
+///end potenailSumContainer class declaration
+
 class grid {
 	public:
 		grid();
 		void printGrid() const;
-		void checkRowsFSoP(cell&);						///Wrapper for checkFamilyFSoP to check row families
-		void checkColumnsFSoP(cell&);					///Wrapper for checkFamilyFSoP to check column families
-		void checkBlocksFSoP(cell&);					///Wrapper for checkFamilyFSoP to check block families
-		void checkRowsFSoN(cell&);						///Wrapper for checkFamilyFSoN to check row families
-		void checkColumnsFSoN(cell&);					///Wrapper for checkFamilyFSoN to check column families
-		void checkBlocksFSoN(cell&);					///Wrapper for checkFamilyFSoN to check block families
+		void checkRowsFSoP(const cell&);						///Wrapper for checkFamilyFSoP to check row families
+		void checkColumnsFSoP(const cell&);					///Wrapper for checkFamilyFSoP to check column families
+		void checkBlocksFSoP(const cell&);					///Wrapper for checkFamilyFSoP to check block families
+		void checkRowsFSoN(const cell&);						///Wrapper for checkFamilyFSoN to check row families
+		void checkColumnsFSoN(const cell&);					///Wrapper for checkFamilyFSoN to check column families
+		void checkBlocksFSoN(const cell&);					///Wrapper for checkFamilyFSoN to check block families
 		short getpoteCellSize() const;					///To get the number of potential cells which still need to have a number assigned
 		void workThroughQueue();						///Iterate through the awaiting assignment queue, assigning numbers to cells
 		void assignRandom();							///Assign a random cell from poteCells one of its random potentials
@@ -19,7 +43,7 @@ class grid {
 	private:
 		void initializeGrid();							///Main handler for constructing the sudoku grid
 		void checkFamilyFSoP(cell**, RCB);				///Main FSoP check handler
-		void checkFamilyFSoN(cell**, RCB);				///Main FSoN check handler
+		void checkFamilyFSoN(cell**);					///Main FSoN check handler
 		void changePotentials(cell&);
 		cell* GRIDRF[9][9];								///Grid Row First (ie, first index is row, second index is column)
 		cell* GRIDCF[9][9];								///Grid Column First (ie, first index is column, second index is row. Simplifies FSoP checking; trust me)
@@ -27,7 +51,9 @@ class grid {
 		std::vector<cell> GRID;							///Grid as just an 81 cell vector; the elements of both GRIDRF and GRIDBB point to the elements in this
 		std::vector<cell*> poteCells;					///Vector of pointers to cells containing the remaining potential occupiable cells; when doing the random assigning
 														///of numbers, first a cell is chosen from here and then one of its potentials is randomly chosen
-		std::queue<cell*> awaiting_assignment;			///To hold cells which have one potential and are awaiting to have it assigned as their number
+		std::queue<CellNum> awaiting_assignment;		///To hold a tuple of a cell and number; the cell is awaiting assignment of that number
+
+		friend class cell;	//Might not be necessary
 };
 
 /*

@@ -2,6 +2,26 @@
 
 using std::cout; using std::endl;
 
+///
+potentialSumContainer::potentialSumContainer() : sum{ 0, 0, 0, 0, 0, 0, 0, 0 } {};
+///
+
+///
+short potentialSumContainer::hasOne() {
+	for (short i = 0; i < 9; ++i) if (this->sum[i] == 1) return i;
+	return 0;
+}
+///
+
+///
+void potentialSumContainer::reset() { for (short i = 0; i < 9; ++i) sum[i] = 0; };
+///	
+
+///
+///Piecewise addition of the potentials in the cells used for generating cell set signatures which are intended ot be used in the FSoP checker
+potentialSumContainer& potentialSumContainer::operator+=(const cell* rhs) { for (short i = 0; i < 9; ++i) this->sum[i] += rhs->getPotential[i]; };
+///
+
 ///Definition function unitStepFunction
 short unitStepFunction(short number, short switchpoint) {
 	if (number >= switchpoint) return 1;
@@ -36,43 +56,43 @@ void grid::printGrid() const {
 
 ///Definition public member function grid class checkRowsFSoP
 ///Row family wrapper for checkFamilyFSoP
-void grid::checkRowsFSoP(cell& C) {
+void grid::checkRowsFSoP(const cell& C) {
 	checkFamilyFSoP(this->GRIDRF[C.getRow()], ROW);
 };
 ///End public member function grid class checkRowsFSoP
 
 ///Definition public member function grid class checkColumnsFSoP
 ///Column family wrapper for checkFamilyFSoP
-void grid::checkColumnsFSoP(cell& C) {
+void grid::checkColumnsFSoP(const cell& C) {
 	checkFamilyFSoP(this->GRIDCF[C.getColumn()], COLUMN);
 };
 ///End public member function grid class checkColumnsFSoP
 
 ///Definition public member function grid class checkBlocksFSoP
 ///Block family wrapper for checkFamilyFSoP
-void grid::checkBlocksFSoP(cell& C) {
+void grid::checkBlocksFSoP(const cell& C) {
 	checkFamilyFSoP(this->GRIDBB[C.getBlock()], BLOCK);
 };
 ///End public member function grid class checkBlocksFSoP
 
 ///Definition public member function grid class checkRowsFSoN
 ///Row family wrapper for checkFamilyFSoP
-void grid::checkRowsFSoN(cell& C) {
-	checkFamilyFSoN(this->GRIDRF[C.getRow()], ROW);
+void grid::checkRowsFSoN(const cell& C) {
+	checkFamilyFSoN(this->GRIDRF[C.getRow()]);
 };
 ///End public member function grid class checkRowsFSoN
 
 ///Definition public member function grid class checkColumnsFSoN
 ///Column family wrapper for checkFamilyFSoP
-void grid::checkColumnsFSoN(cell& C) {
-	checkFamilyFSoN(this->GRIDCF[C.getColumn()], COLUMN);
+void grid::checkColumnsFSoN(const cell& C) {
+	checkFamilyFSoN(this->GRIDCF[C.getColumn()]);
 };
 ///End public member function grid class checkColumnsFSoN
 
 ///Definition public member function grid class checkBlocksFSoN
 ///Block family wrapper for checkFamilyFSoP
-void grid::checkBlocksFSoN(cell& C) {
-	checkFamilyFSoN(this->GRIDBB[C.getBlock()], BLOCK);
+void grid::checkBlocksFSoN(const cell& C) {
+	checkFamilyFSoN(this->GRIDBB[C.getBlock()]);
 };
 ///End public member function grid class checkBlocksFSoN
 
@@ -80,17 +100,18 @@ void grid::checkBlocksFSoN(cell& C) {
 short grid::getpoteCellSize() const {
 	return this->poteCells.size();
 };
-///Definition public member function grid class getpoteCellSize
+///End public member function grid class getpoteCellSize
 
-///
+///Definition public member function grid class workThroughQueue
 void grid::workThroughQueue() {
 	while (!(this->awaiting_assignment.empty())) {
-		(this->awaiting_assignment.front())->setNumber();
-		(this->awaiting_assignment.front())->setNecessityTrue();
+		(this->awaiting_assignment.front().CELL)->setNumber(this->awaiting_assignment.front().NUMBER);
+		(this->awaiting_assignment.front().CELL)->setNecessityTrue();
+		//Once assignment is done, need to do the checking; put that here
 		this->awaiting_assignment.pop();
 	};
 };
-///
+///End public member function grid class workThroughQueue
 
 ///Definition private member function grid class initializeGrid
 ///Initializes the grid; called by the default constructor
@@ -122,17 +143,36 @@ void grid::checkFamilyFSoP(cell** family, RCB rcb) {
 ///End private member function grid class checkFamilyFSoP
 
 ///Definition private member function grid class checkFamilyFSoN
-///Checks the potentials of the passed cell and if it can only contain one number, pushes into the queue
-///If this is not the case, then checks this cell against all cells in each of its three families to see
-///if it is the only cell which may contain a particular number
-void grid::checkFamilyFSoN(cell** family, RCB rcb) {
-	//Impliment FSoN checker here!
+///Main handler for checking FSoN. Takes a family and performs the two FSoN checks on the cells in the family:
+/// 1) For each cell in the family, checks if it has only one potential, and if so, pushes into the queue with that number
+/// 2) "-----", checks if it is the only cell in the family that can contain a specific number and if so, pushes it into the queue with that number
+void grid::checkFamilyFSoN(cell** family) {
+	short temp_index = 0, hit_count = 0;
+	for (short cellInFamily = 0; cellInFamily < 9; ++cellInFamily) {
+		temp_index = hit_count = 0;
+		for (short potentialIndex = 0; potentialIndex < 9; ++potentialIndex)
+			if (family[cellInFamily]->getPotential[potentialIndex]) {
+				temp_index = potentialIndex;
+				++hit_count;
+			}
+		if (hit_count == 1) this->awaiting_assignment.push(CellNum(family[cellInFamily], temp_index + 1));
+	}
+	for (short potentialIndex = 0; potentialIndex < 9; ++potentialIndex) {
+		temp_index = hit_count = 0;
+		for (short cellInFamily = 0; cellInFamily < 9; ++cellInFamily)
+			if (family[cellInFamily]->getPotential[potentialIndex]) {
+				temp_index = cellInFamily;
+				++hit_count;
+			}
+		if (hit_count == 1) this->awaiting_assignment.push(CellNum(family[temp_index], potentialIndex + 1));
+	}
 };
 //Might need to change this to act immediately if issues arrise from a cell waiting with 1 potential being flagged in a subfamily by the FSoP checker
+//In that case, we would need to get rid of the queue... otherwise maybe ANOTHER bool indicating a cell is in the queue so it's not considered?
 ///End private member function grid class checkFamilyFSoN
 
 ///Definition private member function grid class changePotentials
-///Is past a reference to a cell then changes the potential of the number the cell contains to false of all associated cells
+///Is past a reference to a cell then changes the potential of the number the cell contains to false of all cells in that cells families
 void grid::changePotentials(cell& CELL) {
 	for (short i = 0; i < 9; ++i) {
 		GRIDRF[CELL.getRow()][i]->setPotentialFalse(CELL.getNumber() - 1);

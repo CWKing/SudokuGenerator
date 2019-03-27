@@ -3,7 +3,7 @@
 using std::cout; using std::endl; using std::ostream;
 
 ///Definition cell class constructor
-cell::cell(short R, short C, short B) : row(R), column(C), block(B), number(0), potentials{true, true, true, true, true, true, true, true, true}, byNecessity(false), inSubfamily{ false, false, false } {};
+cell::cell(short R, short C, short B) : row(R), column(C), block(B), number(0), potentials{true, true, true, true, true, true, true, true, true}, byNecessity(false), inSubfamily{ false, false, false }, awaitingAssignment(false) {};
 ///End cell class constructor
 
 ///Definition public member function cell class getColumn
@@ -31,9 +31,8 @@ short cell::getNumber() const {
 ///End public member function cell class getNumber
 
 ///Definition public member function cell class getPotentials
-const bool* cell::getPotentials() const {
-	const bool* potenials = this->potentials;
-	return potenials;
+bool cell::getPotential(short index) const {
+	return this->potentials[index];
 };
 ///End public member function cell class getPotentials
 
@@ -42,13 +41,13 @@ bool cell::getNecessity() const {
 	return this->byNecessity;
 };
 ///End public member function cell class getNecessity
-/*
-///Definition public member function cell class setNumber
-void cell::setNumber() {
-	
+
+///Definition public member function cell class isAwaitingAssignment
+bool cell::isAwaitingAssignment() const {
+	return this->awaitingAssignment;
 };
-///End public member function cell class setNumber
-*/
+///End public member function cell class isAwaitingAssignment
+
 ///Definition public member function cell class setNumber
 void cell::setNumber(short num) {
 	this->number = num;
@@ -85,7 +84,7 @@ void cell::toggleSubfamilyBool(RCB rcb){
 ///Definition cell class member operator== overload
 bool cell::operator==(const cell& rhs) const {
 	if (this->NP() != rhs.NP()) return false;
-	for (short i = 0; i < 9; ++i) if (this->potentials[i] != rhs.getPotentials()[i]) return false;
+	for (short i = 0; i < 9; ++i) if (this->potentials[i] != rhs.getPotential[i]) return false;
 	return true;
 };
 ///End cell class operator== overload
@@ -99,11 +98,3 @@ ostream& operator<<(ostream& out, const cell& C) {
 	return out;
 };
 ///End cell class operator<< overload
-
-///Definition cell class non-member operator+ overload
-///To be used in FSoP checking
-short* operator+(short* lhs, const cell& rhs) {
-	for (short i = 0; i < 9; ++i) lhs[i] += static_cast<short>(rhs.getPotentials()[i]);
-	return lhs;
-};
-///End cell class operator+ overload
