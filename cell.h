@@ -17,7 +17,8 @@ class cell {
 		bool isAwaitingAssignment() const;
 		void setNumber(short num);					///Sets the number to be contained in the cell based on what is passed
 		void setPotentialFalse(short index);		///Sets the bool in the potential array at the given index to false
-		void setNecessityTrue();					///Sets the bool of whether or not the cell was given a specific number by necessity to true
+		void setNecessityTrue();					///Self explanitory
+		void setAwaitingAssignmentTrue();			///Self explanitory
 		short NP() const;							///Number of Potentials; returns a short to the number of potentials the cell contains
 		void toggleSubfamilyBool(RCB);				///Toggles whether or not a cell is in a particular subfamily 
 		bool operator==(const cell&) const;			///Overload cell operator==

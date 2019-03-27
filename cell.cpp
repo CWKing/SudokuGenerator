@@ -67,6 +67,12 @@ void cell::setNecessityTrue() {
 };
 ///End public member function cell class setNecessityTrue
 
+///Definition public member function cell class setAwaitingAssignmentTrue
+void cell::setAwaitingAssignmentTrue() {
+	this->awaitingAssignment = true;
+};
+///End public member function cell class setAwaitingAssignmentTrue
+
 ///Definition public member function cell class NP
 short cell::NP() const {
 	short numPot = 0;

@@ -107,11 +107,28 @@ void grid::workThroughQueue() {
 	while (!(this->awaiting_assignment.empty())) {
 		(this->awaiting_assignment.front().CELL)->setNumber(this->awaiting_assignment.front().NUMBER);
 		(this->awaiting_assignment.front().CELL)->setNecessityTrue();
-		//Once assignment is done, need to do the checking; put that here
+		this->initiateAllChecks(this->awaiting_assignment.front().CELL);
 		this->awaiting_assignment.pop();
 	};
 };
 ///End public member function grid class workThroughQueue
+
+///
+void grid::assignRandom() {
+
+};
+///
+
+///Definition public member function grid class initiateAllChecks
+void grid::initiateAllChecks(const cell* toCheck) {
+	this->checkRowsFSoN(*toCheck);
+	this->checkColumnsFSoN(*toCheck);
+	this->checkBlocksFSoN(*toCheck);
+	this->checkRowsFSoP(*toCheck);
+	this->checkColumnsFSoP(*toCheck);
+	this->checkBlocksFSoP(*toCheck);
+};
+///End public member function grid class initiateAllChecks
 
 ///Definition private member function grid class initializeGrid
 ///Initializes the grid; called by the default constructor
@@ -149,26 +166,33 @@ void grid::checkFamilyFSoP(cell** family, RCB rcb) {
 void grid::checkFamilyFSoN(cell** family) {
 	short temp_index = 0, hit_count = 0;
 	for (short cellInFamily = 0; cellInFamily < 9; ++cellInFamily) {
+		if (family[cellInFamily]->getNumber() || family[cellInFamily]->isAwaitingAssignment()) continue;
 		temp_index = hit_count = 0;
 		for (short potentialIndex = 0; potentialIndex < 9; ++potentialIndex)
 			if (family[cellInFamily]->getPotential[potentialIndex]) {
 				temp_index = potentialIndex;
 				++hit_count;
 			}
-		if (hit_count == 1) this->awaiting_assignment.push(CellNum(family[cellInFamily], temp_index + 1));
+		if (hit_count == 1) {
+			family[cellInFamily]->setAwaitingAssignmentTrue();
+			this->awaiting_assignment.push(CellNum(family[cellInFamily], temp_index + 1));
+		}
 	}
 	for (short potentialIndex = 0; potentialIndex < 9; ++potentialIndex) {
 		temp_index = hit_count = 0;
-		for (short cellInFamily = 0; cellInFamily < 9; ++cellInFamily)
+		for (short cellInFamily = 0; cellInFamily < 9; ++cellInFamily) {
+			if (family[cellInFamily]->getNumber() || family[cellInFamily]->isAwaitingAssignment()) continue;
 			if (family[cellInFamily]->getPotential[potentialIndex]) {
 				temp_index = cellInFamily;
 				++hit_count;
 			}
-		if (hit_count == 1) this->awaiting_assignment.push(CellNum(family[temp_index], potentialIndex + 1));
+		}
+		if (hit_count == 1) {
+			family[temp_index]->setAwaitingAssignmentTrue();
+			this->awaiting_assignment.push(CellNum(family[temp_index], potentialIndex + 1));
+		}
 	}
 };
-//Might need to change this to act immediately if issues arrise from a cell waiting with 1 potential being flagged in a subfamily by the FSoP checker
-//In that case, we would need to get rid of the queue... otherwise maybe ANOTHER bool indicating a cell is in the queue so it's not considered?
 ///End private member function grid class checkFamilyFSoN
 
 ///Definition private member function grid class changePotentials
