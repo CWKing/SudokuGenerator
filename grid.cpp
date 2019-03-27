@@ -44,8 +44,9 @@ void grid::printGrid() const {
 		for (short col = 0; col < 9; col++) {
 			if (col % 3 == 0) cout << "|";
 			cout << "[";
-			if (!(GRIDRF[row][col]->getNecessity())) cout << GRIDRF[row][col]->getNumber();
-			else cout << " ";
+			//if (this->GRIDRF[row][col]->getNecessity() || !(this->GRIDRF[row][col]->getNumber())) cout << " ";
+			if (!(this->GRIDRF[row][col]->getNumber())) cout << " "; //The above line is what is wanted; remove this one when done
+			else cout << GRIDRF[row][col]->getNumber();
 			cout << "]";
 		};
 		cout << "|" << endl;
@@ -116,7 +117,7 @@ void grid::workThroughQueue() {
 		this->poteCells.erase(this->poteCells.begin() + this->getpoteCellIndex(*(this->awaiting_assignment.front().CELL)));
 		(this->awaiting_assignment.front().CELL)->setNumber(this->awaiting_assignment.front().NUMBER);
 		(this->awaiting_assignment.front().CELL)->setNecessityTrue();
-		this->changePotentials(*(this->awaiting_assignment.front().CELL));
+		//this->changePotentials(*(this->awaiting_assignment.front().CELL));
 		this->initiateAllChecks(this->awaiting_assignment.front().CELL);
 		this->awaiting_assignment.pop();
 	};
@@ -128,13 +129,27 @@ void grid::assignRandom() {
 	short randomIndex = std::rand() % this->getpoteCellSize();
 	short row = this->poteCells[randomIndex]->getRow();
 	short column = this->poteCells[randomIndex]->getColumn();
+	//debug
+	std::cout << "Current number of remaining cells to fill: " << this->getpoteCellSize() << "\nCell [" << row << ", " << column << "] chosen from poteCells index " << randomIndex << std::endl;
+	//
 	this->poteCells.erase(poteCells.begin() + randomIndex);
 	std::vector<short> potentialNumbers;
-	for (short potentialNumber = 0; potentialNumber < 9; ++potentialNumber)
+	//debug
+	std::cout << "Cell potentials: ";
+	//
+	for (short potentialNumber = 0; potentialNumber < 9; ++potentialNumber) {
+		//debug
+		std::cout << this->GRIDRF[row][column]->getPotential(potentialNumber) << " ";
+		//
 		if (this->GRIDRF[row][column]->getPotential(potentialNumber)) potentialNumbers.push_back(potentialNumber + 1);
+	}
 	randomIndex = std::rand() % potentialNumbers.size();
+	//debug
+	std::cout << "\nSetting number " << potentialNumbers[randomIndex] << " into cell [" << row << ", " << column << "]" << std::endl;
+	//
 	this->GRIDRF[row][column]->setNumber(potentialNumbers[randomIndex]);
 	this->changePotentials(*(this->GRIDRF[row][column]));
+	this->initiateAllChecks(this->GRIDRF[row][column]);
 };
 ///End public member function grid class assignRandom
 
@@ -194,6 +209,9 @@ void grid::checkFamilyFSoN(cell** family) {
 			}
 		if (hit_count == 1) {
 			family[cellInFamily]->setAwaitingAssignmentTrue();
+			//Debug
+			std::cout << "From lone potential check, pushing cell [" << family[cellInFamily]->getRow() << ", " << family[cellInFamily]->getColumn() << "] into queue with number " << temp_index + 1 << std::endl;
+			//
 			this->awaiting_assignment.push(CellNum(family[cellInFamily], temp_index + 1));
 		}
 	}
@@ -208,10 +226,16 @@ void grid::checkFamilyFSoN(cell** family) {
 		}
 		if (hit_count == 1) {
 			family[temp_index]->setAwaitingAssignmentTrue();
+			//Debug
+			std::cout << "From isolated value check, pushing cell [" << family[temp_index]->getRow() << ", " << family[temp_index]->getColumn() << "] into queue with number " << potentialIndex + 1 << std::endl;
+			//
 			this->awaiting_assignment.push(CellNum(family[temp_index], potentialIndex + 1));
+			break;	//Break required to be sure we don't catch the same "isolated" value again in the same family while waiting that numbers assignment
 		}
 	}
 };
+//Problem! Still catching the same "isolated" value; likely the result of cross family member; ie, cells which share two families (ie, row and block or column and block)
+//For these members, we are ignoring other cells in the family awaiting assignment, so we are still catching values as "isolated" though they are to be assigned 
 ///End private member function grid class checkFamilyFSoN
 
 ///Definition private member function grid class changePotentials

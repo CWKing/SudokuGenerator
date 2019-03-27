@@ -9,6 +9,7 @@ void main() {
 	while (newGrid.getpoteCellSize() > 0) {
 		newGrid.workThroughQueue();
 		newGrid.assignRandom();
+		newGrid.printGrid();	//Impliment debugging code
 	};
 	newGrid.printGrid();
 
