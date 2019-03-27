@@ -37,9 +37,4 @@ class cell {
 		friend class grid;	//Might not be necessary
 };
 ///End cell class declaration
-
-///Declaration non-member overload operator<<
-///Passes to the ostream object s the number, row, column, and block of the cell C
-std::ostream& operator<<(std::ostream& s, const cell& C);
-///End declaration non-member overload operator<<
 #endif //CELL_H

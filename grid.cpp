@@ -192,6 +192,19 @@ void grid::initializeGrid() {
 ///cell** is to be interpreted as an array of pointers to cells
 void grid::checkFamilyFSoP(cell** family, RCB rcb) {
 	//Impliment FSoP checker here!
+	//For passed family, check for 2-Subfamilies, then 3-subfamilies, etc up to 7-subfamilies
+	std::vector<cell*> cellSet;	//To hold our temporary "subfamily" to check its signature
+	potentialSumContainer potentialSum;
+	for (short subFamilySize = 2; subFamilySize < 8; ++subFamilySize) {
+		cellSet.clear();
+		for (short cellSubfamilyIndexStart = 0; cellSubfamilyIndexStart < 9; ++cellSubfamilyIndexStart) {
+			cellSet.push_back(family[cellSubfamilyIndexStart]);
+			for (short cellSubfamilyIndex = cellSubfamilyIndex + 1; cellSubfamilyIndex < 9; ++cellSubfamilyIndex) {
+
+			}
+		}
+	}
+
 };
 ///End private member function grid class checkFamilyFSoP
 

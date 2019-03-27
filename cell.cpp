@@ -94,16 +94,3 @@ bool cell::operator==(const cell& rhs) const {
 	return true;
 };
 ///End cell class operator== overload
-
-/*
-///Definition cell class non-member operator<< overload
-///I don't remember why this overload exists
-ostream& operator<<(ostream& out, const cell& C) {
-	out << "Number: " << C.getNumber() << " "
-		<< "Row: " << C.getRow() << " "
-		<< "Column: " << C.getColumn() << " "
-		<< "Block: " << C.getBlock() << endl;
-	return out;
-};
-///End cell class operator<< overload
-*/

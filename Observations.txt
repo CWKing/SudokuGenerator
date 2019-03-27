@@ -45,6 +45,42 @@ Identifying Subfamily locks:
 
 	Under the assumption this pattern holds, we will call the sequence created from the piecewise sum of the potentials of a set of k cells the set's SIGNATURE. To identify a subfamily, we need to check in each family every possible set (up to ordering) of cells and from each set, if its signature matches that of a subfamily. Once a subfamily has been identified, we will need to have information regarding what family the subfamily resides in, and the cells which comprise the subfamily so that we may perform the proper potential exclusion from the remaining cells in the family.
 
+Each k-subfamily will have 9_Choose_k total combinations
+For a cell with family index I, the number of combinations with it as the starting element in a k-subfamily is (9-I)_choose_k
+
+2-Subfamily groupings:
+01 02 03 04 05 06 07 08		8 pairs 8_choose_1
+12 13 14 15 16 17 18		7		7_choose_1
+23 24 25 26 27 28			6
+34 35 36 37 38				5
+45 46 47 48					4
+56 57 58					3
+67 68						2
+78							1
+depth is 8; total pairs is 36 (9_choose_2)
+
+3-Subfamily groupings:
+012 013 014 015 016 017 018 023 024 025 026 027 028 034 035 036 037 038 045 046 047 048 056 057 058 067 068 078		28 triplets 8_choose_2
+123 124 125 126 127 128 134 135 136 137 138 145 146 147 148 156 157 158 167 168 178									21			7_choose_2
+234 235 236 237 238 245 246 247 248 256 257 258 267 268 278															15
+345 346 347 348 356 357 358 367 368 378																				10
+456 457 458 467 468 478																								6
+567 568 578																											3
+678																													1
+depth is 7; total triplets is 84 (9_choose_3)
+
+4-Subfamily groupings:
+0123 0124 0125 0126 0127 0128 0134 0135 0136 0137 0138 0145 0146 0147 0148 0156 0157 0158 0167 0168 0178 0234 0235 0236 0237 0238 0245 0246 0247 0248 0256 0257 0258 0267 0268 0278 0345 0346 0347 0348 0356 0357 0358 0367 0368 0378 0456 0457 0458 0467 0468 0478 0567 0568 0578 0678		56 quadruplets 8_choose_3
+1234 1235 1236 1237 1238 1245 1246 1247 1248 1256 1257 1258 1267 1268 1278 1345 1346 1347 1348 1356 1357 1358 1367 1368 1378 1456 1457 1458 1467 1468 1478 1567 1568 1578 1678		35		7_choose_3
+2345 2346 2347 2348 2356 2357 2358 2367 2368 2378 2456 2457 2458 2467 2468 2478 2567 2568 2578 2678		20		6_choose_3
+3456 3457 3458 3467 3468 3478 3567 3568 3578 3678		10
+4567 4568 4578 4678		4
+5678		1
+depth is 6; total pairs is 126 (9_choose_4)
+
+How do we iterate to perform the FSoP checks?
+Seems conducive to a recursive function call but I can't think of exactly how to impliment it.
+
 Since a completed sudoku puzzle contains exactly one number from 1 to 9 exactly once in each row and column, is it the case that a completed sudoku puzzle forms a "jumbled" operation table of an order 9 group? All order nine groups are isomorphic to either integers mod 9 or integers mod 3 cross integers mod 3, both of which are abelian, so maybe it's not too difficult to find out. If so, maybe use this concept to generate sudoku puzzles by re-jumbling the rows and columns, then putting the product of the rows and columns in the associated spots?
 
 A complete sudoku from previous attempt; was successful for this particular seed (0)
