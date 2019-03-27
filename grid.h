@@ -37,6 +37,7 @@ class grid {
 		void checkColumnsFSoN(const cell&);				///Wrapper for checkFamilyFSoN to check column families
 		void checkBlocksFSoN(const cell&);				///Wrapper for checkFamilyFSoN to check block families
 		short getpoteCellSize() const;					///To get the number of potential cells which still need to have a number assigned
+		short getpoteCellIndex(const cell&) const;		///Get the index of a cell in the poteCells vector; used for deleting those from the vector
 		void workThroughQueue();						///Iterate through the awaiting assignment queue, assigning numbers to cells
 		void assignRandom();							///Assign a random cell from poteCells one of its random potentials
 		void initiateAllChecks(const cell*);			///Initiate all checks on a given cell and its families

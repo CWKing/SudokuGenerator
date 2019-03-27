@@ -102,22 +102,41 @@ short grid::getpoteCellSize() const {
 };
 ///End public member function grid class getpoteCellSize
 
+///
+short grid::getpoteCellIndex(const cell& toCheck) const {
+	for (short i = 0; i < this->getpoteCellSize(); ++i)
+		if (this->poteCells[i]->getRow() == toCheck.getRow() && this->poteCells[i]->getColumn() == toCheck.getColumn())
+			return i;
+};
+///
+
 ///Definition public member function grid class workThroughQueue
 void grid::workThroughQueue() {
 	while (!(this->awaiting_assignment.empty())) {
+		this->poteCells.erase(this->poteCells.begin() + this->getpoteCellIndex(*(this->awaiting_assignment.front().CELL)));
 		(this->awaiting_assignment.front().CELL)->setNumber(this->awaiting_assignment.front().NUMBER);
 		(this->awaiting_assignment.front().CELL)->setNecessityTrue();
+		this->changePotentials(*(this->awaiting_assignment.front().CELL));
 		this->initiateAllChecks(this->awaiting_assignment.front().CELL);
 		this->awaiting_assignment.pop();
 	};
 };
 ///End public member function grid class workThroughQueue
 
-///
+///Definition public member function grid class assignRandom
 void grid::assignRandom() {
-
+	short randomIndex = std::rand() % this->getpoteCellSize();
+	short row = this->poteCells[randomIndex]->getRow();
+	short column = this->poteCells[randomIndex]->getColumn();
+	this->poteCells.erase(poteCells.begin() + randomIndex);
+	std::vector<short> potentialNumbers;
+	for (short potentialNumber = 0; potentialNumber < 9; ++potentialNumber)
+		if (this->GRIDRF[row][column]->getPotential(potentialNumber)) potentialNumbers.push_back(potentialNumber + 1);
+	randomIndex = std::rand() % potentialNumbers.size();
+	this->GRIDRF[row][column]->setNumber(potentialNumbers[randomIndex]);
+	this->changePotentials(*(this->GRIDRF[row][column]));
 };
-///
+///End public member function grid class assignRandom
 
 ///Definition public member function grid class initiateAllChecks
 void grid::initiateAllChecks(const cell* toCheck) {
