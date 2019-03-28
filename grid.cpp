@@ -212,25 +212,41 @@ void grid::FSoPsubFamCheck(std::vector<cell*>& cellSet, RCB rcb) {
 ///
 
 ///
-void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short STARTINDEX, short FAMILY_SIZE) {
-	/*if (STARTINDEX + FAMILY_SIZE < 9) this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, FAMILY_SIZE);
-	else {
-		//we've reached the single last group, calculate it's thing
-	}
-	cellSet.clear();
-	this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, FAMILY_SIZE - 1);
-	*/
-	//for (short i = 0; i < FAMILY_SIZE; ++i) cellSet.push_back(family[STARTINDEX + i]);
-	if (1 < FAMILY_SIZE) {
+void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short STARTINDEX, short SUBFAMILY_SIZE) {
+
+	//If the sum of the starting index and the size of the family is greater than 8, then we return (impossible to make a subfamily)
+	if (9 < STARTINDEX + SUBFAMILY_SIZE) return;
+
+	//If 1 is less than the size of the subfamily, push back the cell at the current starting index, and recursive call with incremented starting index and decremented subfamily size
+	if (1 < SUBFAMILY_SIZE) {
 		cellSet.push_back(family[STARTINDEX]);
-		this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, FAMILY_SIZE - 1);
+		this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, SUBFAMILY_SIZE - 1);
+
+	//Otherwise the "subfamily" size is 1 (eg, it's a cell); iterate checks over the rest of the cells in the family starting at the startindex 
 	} else for (short i = STARTINDEX; i < 9; ++i) {
 		cellSet.push_back(family[i]);
 		this->FSoPsubFamCheck(cellSet, rcb);
 		cellSet.pop_back();
 	}
-	cellSet.pop_back();
-	if (STARTINDEX < 8) this->FSoPHelper(family, cellSet, rcb, STARTINDEX, FAMILY_SIZE + 1);
+
+	//Once we've done that check, we need to pop the last element; if cellSet is empty at this point, then we were winding out, so we should return
+	if(!cellSet.empty()) cellSet.pop_back();
+	else return;
+
+	//Once we've popped, we need to recursivly call, which should push the cell in the family after the one we just popped into cellSet.
+	//At this point, STARTINDEX should be the index of that cell. Because we popped, we need to increment the subfamily size to reflect this
+	this->FSoPHelper(family, cellSet, rcb, STARTINDEX, SUBFAMILY_SIZE + 1);
+
+	/*
+	Desired behaviour is that once it has completed all the 2 family checks (which this current code "does", eg, the check DOES check but the result of
+	that check is sent to a null function), it moves on to the 3 family checks (where the "fun" begins...), that is, the entire FSoPHelper recursive stack
+	has been unwound. When do we know its finished with ANY size check?
+	
+	
+	Currently pushes until we are dealing with a "1-subfamily" (eg, a single cell), then iterates over what that cell could be.
+	Once that iteration is completed, it pops the second-to-last cell provided the cellSet is not empty, and returns if it IS empty. Provided it is not
+	empty, it then calls itself with an incremented start index and incremented family size
+	*/
 }
 ///
 
