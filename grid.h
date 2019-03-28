@@ -23,7 +23,8 @@ class CellNum {
 ///Intention is to be used for FSoP checking
 class potentialSumContainer {
 	potentialSumContainer();
-	short hasOne();
+	short hasOne();	//Might not be necessary
+	bool hasSubfamSignature(short);
 	void reset();
 	potentialSumContainer& operator+=(const cell*);
 	short sum[9];
@@ -50,6 +51,9 @@ class grid {
 
 	private:
 		void initializeGrid();								///Main handler for constructing the sudoku grid
+		void FSoPChangePotentials(std::vector<cell*>&, RCB);
+		void FSoPsubFamCheck(std::vector<cell*>&, RCB);
+		void FSoPHelper(cell**, std::vector<cell*>&, RCB, short, short);
 		void checkFamilyFSoP(cell**, RCB);					///Main FSoP check handler
 		void checkFamilyFSoN(cell**);						///Main FSoN check handler
 		void changePotentials(cell&);						///Takes a reference to a cell and changes the potentials of all the cells in the passed cells families

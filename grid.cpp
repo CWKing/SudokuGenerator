@@ -12,6 +12,19 @@ short potentialSumContainer::hasOne() {
 ///
 
 ///
+bool potentialSumContainer::hasSubfamSignature(short subFamSize) {
+	short hit_count = 0;
+	for (short i = 0; i < 9; ++i) {
+		if (this->sum[i] == 1) return false;
+		else if (this->sum[i] == 0) continue;
+		else ++hit_count;
+	}
+	if (hit_count != subFamSize) return false;
+	else return true;
+};
+///
+
+///
 void potentialSumContainer::reset() { for (short i = 0; i < 9; ++i) sum[i] = 0; };
 ///	
 
@@ -184,6 +197,43 @@ void grid::initializeGrid() {
 };
 ///End private member function grid class initializeGrid
 
+///
+void grid::FSoPChangePotentials(std::vector<cell*>& subFamily, RCB rcb) {
+
+}
+///
+
+///
+void grid::FSoPsubFamCheck(std::vector<cell*>& cellSet, RCB rcb) {
+	potentialSumContainer potentialSum;
+	for (short i = 0; i < cellSet.size(); ++i) potentialSum += cellSet[i];
+	if (potentialSum.hasSubfamSignature(cellSet.size())) FSoPChangePotentials(cellSet, rcb);
+}
+///
+
+///
+void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short STARTINDEX, short FAMILY_SIZE) {
+	/*if (STARTINDEX + FAMILY_SIZE < 9) this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, FAMILY_SIZE);
+	else {
+		//we've reached the single last group, calculate it's thing
+	}
+	cellSet.clear();
+	this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, FAMILY_SIZE - 1);
+	*/
+	//for (short i = 0; i < FAMILY_SIZE; ++i) cellSet.push_back(family[STARTINDEX + i]);
+	if (1 < FAMILY_SIZE) {
+		cellSet.push_back(family[STARTINDEX]);
+		this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, FAMILY_SIZE - 1);
+	} else for (short i = STARTINDEX; i < 9; ++i) {
+		cellSet.push_back(family[i]);
+		this->FSoPsubFamCheck(cellSet, rcb);
+		cellSet.pop_back();
+	}
+	cellSet.pop_back();
+	if (STARTINDEX < 8) this->FSoPHelper(family, cellSet, rcb, STARTINDEX, FAMILY_SIZE + 1);
+}
+///
+
 ///Definition private member function grid class checkFamilyFSoP
 ///Main handler for checking FSoP. Takes a family and performs the more complicated FSoP checks.
 ///As after changing potentials, previous checks become invalidated (new subfamilies could have been created), we will have to restart the check from the very beginning
@@ -193,18 +243,12 @@ void grid::initializeGrid() {
 void grid::checkFamilyFSoP(cell** family, RCB rcb) {
 	//Impliment FSoP checker here!
 	//For passed family, check for 2-Subfamilies, then 3-subfamilies, etc up to 7-subfamilies
-	std::vector<cell*> cellSet;	//To hold our temporary "subfamily" to check its signature
-	potentialSumContainer potentialSum;
+	//To hold our temporary "subfamily" to check its signature
+	std::vector<cell*> cellSet;
 	for (short subFamilySize = 2; subFamilySize < 8; ++subFamilySize) {
 		cellSet.clear();
-		for (short cellSubfamilyIndexStart = 0; cellSubfamilyIndexStart < 9; ++cellSubfamilyIndexStart) {
-			cellSet.push_back(family[cellSubfamilyIndexStart]);
-			for (short cellSubfamilyIndex = cellSubfamilyIndex + 1; cellSubfamilyIndex < 9; ++cellSubfamilyIndex) {
-
-			}
-		}
+		this->FSoPHelper(family, cellSet, rcb, 0, subFamilySize);
 	}
-
 };
 ///End private member function grid class checkFamilyFSoP
 

@@ -79,7 +79,11 @@ depth is 7; total triplets is 84 (9_choose_3)
 depth is 6; total pairs is 126 (9_choose_4)
 
 How do we iterate to perform the FSoP checks?
-Seems conducive to a recursive function call but I can't think of exactly how to impliment it.
+Seems conducive to a recursive function call but I can't think of exactly how to implement it.
+Seems we might be best suited to recurse over the starting index until the length of the family + the starting index is equal to 9
+
+We will try to conceptualize through the 4-Subfamily groupings
+recursive call until starting index is 5 (subfamily size will still be 4)
 
 Since a completed sudoku puzzle contains exactly one number from 1 to 9 exactly once in each row and column, is it the case that a completed sudoku puzzle forms a "jumbled" operation table of an order 9 group? All order nine groups are isomorphic to either integers mod 9 or integers mod 3 cross integers mod 3, both of which are abelian, so maybe it's not too difficult to find out. If so, maybe use this concept to generate sudoku puzzles by re-jumbling the rows and columns, then putting the product of the rows and columns in the associated spots?
 
