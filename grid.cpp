@@ -231,6 +231,7 @@ void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short
 
 	//Once we've done that check, we need to pop the last element; if cellSet is empty at this point, then we were winding out, so we should return
 	if(!cellSet.empty()) cellSet.pop_back();
+	else if (SUBFAMILY_SIZE > 2) this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, SUBFAMILY_SIZE);
 	else return;
 
 	//Once we've popped, we need to recursivly call, which should push the cell in the family after the one we just popped into cellSet.
