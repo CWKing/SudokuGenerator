@@ -15,6 +15,7 @@ class cell {
 		bool getPotential(short) const;				///Returns a bool specifiying if the number indexed by the passed short is a potential number the cell can contain
 		bool getNecessity() const;					///Returns a bool of whether or not the number in the cell was set by necessity (true) or randomly (false)
 		bool isAwaitingAssignment() const;
+		bool isInSubfamily(RCB) const;
 		void setNumber(short num);					///Sets the number to be contained in the cell based on what is passed
 		void setPotentialFalse(short index);		///Sets the bool in the potential array at the given index to false
 		void setNecessityTrue();					///Self explanitory

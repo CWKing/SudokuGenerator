@@ -51,9 +51,9 @@ class grid {
 
 	private:
 		void initializeGrid();								///Main handler for constructing the sudoku grid
-		void FSoPChangePotentials(std::vector<cell*>&, RCB);
-		void FSoPsubFamCheck(std::vector<cell*>&, RCB);
-		void FSoPHelper(cell**, std::vector<cell*>&, RCB, short, short);
+		void FSoPChangePotentials(cell**, std::vector<cell*>&, potentialSumContainer&);
+		void FSoPsubFamCheck(cell**, std::vector<cell*>&, RCB);
+		void FSoPRecursiveHelper(cell**, std::vector<cell*>&, RCB, short, short);
 		void checkFamilyFSoP(cell**, RCB);					///Main FSoP check handler
 		void checkFamilyFSoN(cell**);						///Main FSoN check handler
 		void changePotentials(cell&);						///Takes a reference to a cell and changes the potentials of all the cells in the passed cells families

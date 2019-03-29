@@ -198,42 +198,44 @@ void grid::initializeGrid() {
 ///End private member function grid class initializeGrid
 
 ///
-void grid::FSoPChangePotentials(std::vector<cell*>& subFamily, RCB rcb) {
-	//Implimentation here would take the subFamily passed, record the potentials, and make the appropriate potential changes
+void grid::FSoPChangePotentials(cell** family, std::vector<cell*>& subFamily, potentialSumContainer& potenialList) {
+	bool in_passed_subfamily = false;
+	for (short potential = 0; potential < 9; ++potential) {
+		if (potenialList.sum[potential]) {
+			for (short cell_family_index = 0; cell_family_index < 9; ++cell_family_index) {
+				for (short subfamily_index = 0; subfamily_index < subFamily.size(); ++subfamily_index)
+					if (family[cell_family_index] == subFamily[subfamily_index]) in_passed_subfamily = true;
+				if (in_passed_subfamily || family[cell_family_index]->isAwaitingAssignment()) continue;
+				else family[cell_family_index]->setPotentialFalse(potential);
+			}
+		}
+	}
 };
 ///
 
 ///
-void grid::FSoPsubFamCheck(std::vector<cell*>& cellSet, RCB rcb) {
+void grid::FSoPsubFamCheck(cell** family, std::vector<cell*>& cellSet, RCB rcb) {
 	potentialSumContainer potentialSum;
 	for (short i = 0; i < cellSet.size(); ++i) potentialSum += cellSet[i];
-	if (potentialSum.hasSubfamSignature(cellSet.size())) FSoPChangePotentials(cellSet, rcb);
+	if (potentialSum.hasSubfamSignature(cellSet.size())) {
+		for (short i = 0; i < cellSet.size(); ++i) cellSet[i]->toggleSubfamilyBool(rcb);
+		FSoPChangePotentials(family, cellSet, potentialSum);
+	}
 };
 ///
 
 ///
-void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short START_INDEX, short SUBFAMILY_SIZE) {
-
+void grid::FSoPRecursiveHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short START_INDEX, short SUBFAMILY_SIZE) {
 	if (SUBFAMILY_SIZE == 0) {
-		//this->FSoPsubFamCheck(cellSet, rcb);
+		this->FSoPsubFamCheck(family, cellSet, rcb);
 		return;
 	}
 	for (short index = START_INDEX; index <= 9 - SUBFAMILY_SIZE; ++index) {
-		cellSet.push_back(family[index]);
-		this->FSoPHelper(family, cellSet, rcb, index + 1, SUBFAMILY_SIZE - 1);
+		if(!family[index]->isAwaitingAssignment() && !family[index]->isInSubfamily(rcb)) cellSet.push_back(family[index]);
+		else continue;
+		this->FSoPRecursiveHelper(family, cellSet, rcb, index + 1, SUBFAMILY_SIZE - 1);
 		cellSet.pop_back();
 	}
-
-	/*
-	Desired behaviour is that once it has completed all the 2 family checks (which this current code "does", eg, the check DOES check but the result of
-	that check is sent to a null function), it moves on to the 3 family checks (where the "fun" begins...), that is, the entire FSoPHelper recursive stack
-	has been unwound. When do we know its finished with ANY size check?
-	
-	
-	Currently pushes until we are dealing with a "1-subfamily" (eg, a single cell), then iterates over what that cell could be.
-	Once that iteration is completed, it pops the second-to-last cell provided the cellSet is not empty, and returns if it IS empty. Provided it is not
-	empty, it then calls itself with an incremented start index and incremented family size
-	*/
 };
 ///
 
@@ -249,7 +251,7 @@ void grid::checkFamilyFSoP(cell** family, RCB rcb) {
 	std::vector<cell*> cellSet;
 	for (short subFamilySize = 2; subFamilySize < 9; ++subFamilySize) {
 		cellSet.clear();
-		this->FSoPHelper(family, cellSet, rcb, 0, subFamilySize);
+		this->FSoPRecursiveHelper(family, cellSet, rcb, 0, subFamilySize);
 	}
 };
 ///End private member function grid class checkFamilyFSoP

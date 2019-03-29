@@ -48,6 +48,12 @@ bool cell::isAwaitingAssignment() const {
 };
 ///End public member function cell class isAwaitingAssignment
 
+///
+bool cell::isInSubfamily(RCB rcb) const {
+	return this->inSubfamily[rcb];
+};
+///
+
 ///Definition public member function cell class setNumber
 void cell::setNumber(short num) {
 	this->number = num;
