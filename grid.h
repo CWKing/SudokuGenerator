@@ -22,6 +22,9 @@ class CellNum {
 ///potentialSumContainer helper class declaration
 ///Intention is to be used for FSoP checking
 class potentialSumContainer {
+public:
+	short operator[](short) const;
+private:
 	potentialSumContainer();
 	short hasOne();	//Might not be necessary
 	bool hasSubfamSignature(short);
@@ -31,6 +34,8 @@ class potentialSumContainer {
 
 	friend class grid;
 };
+
+std::ostream& operator<<(std::ostream&, const potentialSumContainer&);
 ///end potenailSumContainer class declaration
 
 class grid {

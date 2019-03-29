@@ -33,6 +33,21 @@ void potentialSumContainer::reset() { for (short i = 0; i < 9; ++i) sum[i] = 0; 
 potentialSumContainer& potentialSumContainer::operator+=(const cell* rhs) { for (short i = 0; i < 9; ++i) this->sum[i] += rhs->getPotential(i); return *this; };
 ///
 
+///
+short potentialSumContainer::operator[](short index) const {
+	return this->sum[index];
+}
+///
+
+///
+std::ostream& operator<<(std::ostream& out, const potentialSumContainer& potentialSum) {
+	out << "[ ";
+	for (short i = 0; i < 8; ++i) out << potentialSum[i] << ", ";
+	out << potentialSum[8] << "]";
+	return out;
+};
+///
+
 ///Definition function unitStepFunction
 short unitStepFunction(short number, short switchpoint) {
 	if (number >= switchpoint) return 1;
@@ -216,8 +231,24 @@ void grid::FSoPChangePotentials(cell** family, std::vector<cell*>& subFamily, po
 ///
 void grid::FSoPsubFamCheck(cell** family, std::vector<cell*>& cellSet, RCB rcb) {
 	potentialSumContainer potentialSum;
+	//debug
+	if (debug) {
+		std::cout << "Checking cell set { ";
+		for (short i = 0; i < cellSet.size(); ++i) std::cout << "[" << cellSet[i]->getRow() << ", " << cellSet[i]->getColumn() << "] ";
+		std::cout << "}" << " for subfamily signature" << std::endl;
+		std::cin.ignore();
+		std::cin.get();
+	}
+	//
 	for (short i = 0; i < cellSet.size(); ++i) potentialSum += cellSet[i];
+	//debug
+	if (debug) std::cout << "Cell set signature" << potentialSum << std::endl;
+
+	//
 	if (potentialSum.hasSubfamSignature(cellSet.size())) {
+		//debug
+		if (debug) std::cout << "Subfamily found!" << std::endl;
+		//
 		for (short i = 0; i < cellSet.size(); ++i) cellSet[i]->toggleSubfamilyBool(rcb);
 		FSoPChangePotentials(family, cellSet, potentialSum);
 	}
@@ -251,6 +282,15 @@ void grid::checkFamilyFSoP(cell** family, RCB rcb) {
 	std::vector<cell*> cellSet;
 	for (short subFamilySize = 2; subFamilySize < 9; ++subFamilySize) {
 		cellSet.clear();
+		//debug
+		if (debug) {
+			std::cout << "Begining check for subfamilies of the " <<
+				((1 < rcb) ? (family[0]->getBlock() << *" block family") :
+				(0 < rcb) ? (family[0]->getColumn() << *" column family") :
+					(family[0]->getRow() << *" row family"));
+			std::cout << std::endl;
+		}
+		//
 		this->FSoPRecursiveHelper(family, cellSet, rcb, 0, subFamilySize);
 	}
 };
