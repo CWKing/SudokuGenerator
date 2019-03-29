@@ -48,6 +48,15 @@ std::ostream& operator<<(std::ostream& out, const potentialSumContainer& potenti
 };
 ///
 
+///
+std::ostream& operator<<(std::ostream& out, const std::vector<cell*>& cellSet) {
+	out << "{ ";
+	for (short i = 0; i < cellSet.size() - 1; ++i) out << "[" << cellSet[i]->getRow() << ", " << cellSet[i]->getColumn() << "], ";
+	out << "[" << cellSet.back()->getRow() << ", " << cellSet.back()->getColumn() << "]}";
+	return out;
+};
+///
+
 ///Definition function unitStepFunction
 short unitStepFunction(short number, short switchpoint) {
 	if (number >= switchpoint) return 1;
@@ -232,22 +241,21 @@ void grid::FSoPChangePotentials(cell** family, std::vector<cell*>& subFamily, po
 void grid::FSoPsubFamCheck(cell** family, std::vector<cell*>& cellSet, RCB rcb) {
 	potentialSumContainer potentialSum;
 	//debug
-	if (debug) {
+	if (debug && crazy) {
 		std::cout << "Checking cell set { ";
 		for (short i = 0; i < cellSet.size(); ++i) std::cout << "[" << cellSet[i]->getRow() << ", " << cellSet[i]->getColumn() << "] ";
 		std::cout << "}" << " for subfamily signature" << std::endl;
-		std::cin.ignore();
 		std::cin.get();
 	}
 	//
 	for (short i = 0; i < cellSet.size(); ++i) potentialSum += cellSet[i];
 	//debug
-	if (debug) std::cout << "Cell set signature" << potentialSum << std::endl;
+	if (debug && crazy) std::cout << "Cell set signature" << potentialSum << std::endl;
 
 	//
 	if (potentialSum.hasSubfamSignature(cellSet.size())) {
 		//debug
-		if (debug) std::cout << "Subfamily found!" << std::endl;
+		if (debug) std::cout << "Subfamily found!\n" << cellSet << std::endl << "Had signature " << potentialSum << std::endl;
 		//
 		for (short i = 0; i < cellSet.size(); ++i) cellSet[i]->toggleSubfamilyBool(rcb);
 		FSoPChangePotentials(family, cellSet, potentialSum);
@@ -262,7 +270,7 @@ void grid::FSoPRecursiveHelper(cell** family, std::vector<cell*>& cellSet, RCB r
 		return;
 	}
 	for (short index = START_INDEX; index <= 9 - SUBFAMILY_SIZE; ++index) {
-		if(!family[index]->isAwaitingAssignment() && !family[index]->isInSubfamily(rcb)) cellSet.push_back(family[index]);
+		if(!family[index]->isAwaitingAssignment() && !family[index]->isInSubfamily(rcb) && !family[index]->getNumber()) cellSet.push_back(family[index]);
 		else continue;
 		this->FSoPRecursiveHelper(family, cellSet, rcb, index + 1, SUBFAMILY_SIZE - 1);
 		cellSet.pop_back();
@@ -277,18 +285,27 @@ void grid::FSoPRecursiveHelper(cell** family, std::vector<cell*>& cellSet, RCB r
 ///to be sure when checking for exclusion based on already being in a subfamily, we know which family we are considering.
 ///cell** is to be interpreted as an array of pointers to cells
 void grid::checkFamilyFSoP(cell** family, RCB rcb) {
-	//For passed family, check for 2-Subfamilies, then 3-subfamilies, etc up to 8-subfamilies
+	//For passed family, check for 2-Subfamilies, then 3-subfamilies, etc up to 7-subfamilies
 	//To hold our temporary "subfamily" to check its signature
 	std::vector<cell*> cellSet;
-	for (short subFamilySize = 2; subFamilySize < 9; ++subFamilySize) {
+	for (short subFamilySize = 2; subFamilySize < 8; ++subFamilySize) {
 		cellSet.clear();
 		//debug
 		if (debug) {
-			std::cout << "Begining check for subfamilies of the " <<
-				((1 < rcb) ? (family[0]->getBlock() << *" block family") :
-				(0 < rcb) ? (family[0]->getColumn() << *" column family") :
-					(family[0]->getRow() << *" row family"));
-			std::cout << std::endl;
+			std::cout << "Begining check for subfamilies of the ";
+			switch (rcb)
+			{
+			case ROW:
+				std::cout << family[0]->getRow() << " row family";
+				break;
+			case COLUMN:
+				std::cout << family[0]->getColumn() << " column family";
+				break;
+			case BLOCK:
+				std::cout << family[0]->getBlock() << " block family";
+				break;
+			}
+			std::cout << " of size " << subFamilySize << std::endl;
 		}
 		//
 		this->FSoPRecursiveHelper(family, cellSet, rcb, 0, subFamilySize);

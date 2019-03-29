@@ -7,6 +7,7 @@
 
 ///THE ONLY SEMI-GLOBAL VARIABLE
 extern bool debug;
+extern bool crazy;
 ///DO NOT PANIC
 
 ///
@@ -37,6 +38,8 @@ private:
 
 std::ostream& operator<<(std::ostream&, const potentialSumContainer&);
 ///end potenailSumContainer class declaration
+
+std::ostream& operator<<(std::ostream&, const std::vector<cell*>&);
 
 class grid {
 	public:
