@@ -199,8 +199,8 @@ void grid::initializeGrid() {
 
 ///
 void grid::FSoPChangePotentials(std::vector<cell*>& subFamily, RCB rcb) {
-
-}
+	//Implimentation here would take the subFamily passed, record the potentials, and make the appropriate potential changes
+};
 ///
 
 ///
@@ -208,35 +208,21 @@ void grid::FSoPsubFamCheck(std::vector<cell*>& cellSet, RCB rcb) {
 	potentialSumContainer potentialSum;
 	for (short i = 0; i < cellSet.size(); ++i) potentialSum += cellSet[i];
 	if (potentialSum.hasSubfamSignature(cellSet.size())) FSoPChangePotentials(cellSet, rcb);
-}
+};
 ///
 
 ///
-void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short STARTINDEX, short SUBFAMILY_SIZE) {
+void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short START_INDEX, short SUBFAMILY_SIZE) {
 
-	//If the sum of the starting index and the size of the family is greater than 8, then we return (impossible to make a subfamily)
-	if (9 < STARTINDEX + SUBFAMILY_SIZE) return;
-
-	//If 1 is less than the size of the subfamily, push back the cell at the current starting index, and recursive call with incremented starting index and decremented subfamily size
-	if (1 < SUBFAMILY_SIZE) {
-		cellSet.push_back(family[STARTINDEX]);
-		this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, SUBFAMILY_SIZE - 1);
-
-	//Otherwise the "subfamily" size is 1 (eg, it's a cell); iterate checks over the rest of the cells in the family starting at the startindex 
-	} else for (short i = STARTINDEX; i < 9; ++i) {
-		cellSet.push_back(family[i]);
-		this->FSoPsubFamCheck(cellSet, rcb);
+	if (SUBFAMILY_SIZE == 0) {
+		//this->FSoPsubFamCheck(cellSet, rcb);
+		return;
+	}
+	for (short index = START_INDEX; index <= 9 - SUBFAMILY_SIZE; ++index) {
+		cellSet.push_back(family[index]);
+		this->FSoPHelper(family, cellSet, rcb, index + 1, SUBFAMILY_SIZE - 1);
 		cellSet.pop_back();
 	}
-
-	//Once we've done that check, we need to pop the last element; if cellSet is empty at this point, then we were winding out, so we should return
-	if(!cellSet.empty()) cellSet.pop_back();
-	else if (SUBFAMILY_SIZE > 2) this->FSoPHelper(family, cellSet, rcb, STARTINDEX + 1, SUBFAMILY_SIZE);
-	else return;
-
-	//Once we've popped, we need to recursivly call, which should push the cell in the family after the one we just popped into cellSet.
-	//At this point, STARTINDEX should be the index of that cell. Because we popped, we need to increment the subfamily size to reflect this
-	this->FSoPHelper(family, cellSet, rcb, STARTINDEX, SUBFAMILY_SIZE + 1);
 
 	/*
 	Desired behaviour is that once it has completed all the 2 family checks (which this current code "does", eg, the check DOES check but the result of
@@ -248,7 +234,7 @@ void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short
 	Once that iteration is completed, it pops the second-to-last cell provided the cellSet is not empty, and returns if it IS empty. Provided it is not
 	empty, it then calls itself with an incremented start index and incremented family size
 	*/
-}
+};
 ///
 
 ///Definition private member function grid class checkFamilyFSoP
@@ -258,11 +244,10 @@ void grid::FSoPHelper(cell** family, std::vector<cell*>& cellSet, RCB rcb, short
 ///to be sure when checking for exclusion based on already being in a subfamily, we know which family we are considering.
 ///cell** is to be interpreted as an array of pointers to cells
 void grid::checkFamilyFSoP(cell** family, RCB rcb) {
-	//Impliment FSoP checker here!
-	//For passed family, check for 2-Subfamilies, then 3-subfamilies, etc up to 7-subfamilies
+	//For passed family, check for 2-Subfamilies, then 3-subfamilies, etc up to 8-subfamilies
 	//To hold our temporary "subfamily" to check its signature
 	std::vector<cell*> cellSet;
-	for (short subFamilySize = 2; subFamilySize < 8; ++subFamilySize) {
+	for (short subFamilySize = 2; subFamilySize < 9; ++subFamilySize) {
 		cellSet.clear();
 		this->FSoPHelper(family, cellSet, rcb, 0, subFamilySize);
 	}
